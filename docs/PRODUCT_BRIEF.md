@@ -2,7 +2,7 @@
 
 **Version 0.1 · 2026-07-24 · Status: research synthesis, pre-build**
 
-A native macOS app that turns a ~$110 touchscreen strip display (8.8" 480x1920 bar) into a live control deck for Claude Code: glanceable state for every running session, approve/deny from the strip, and one-tap focus — the Codex Micro idea, done the way reviewers said it should have been done, for Claude Code, in software, open source.
+A native macOS app that turns a touchscreen strip display (8.8" 480x1920 bar) into a live control deck for Claude Code: glanceable state for every running session, approve/deny from the strip, and one-tap focus — the Codex Micro idea, done the way reviewers said it should have been done, for Claude Code, in software, open source.
 
 Supporting research: [Codex Micro](research/01-codex-micro.md) · [Strip hardware & macOS](research/02-strip-display-hardware.md) · [Claude Code integration surface](research/03-claude-code-integration.md) · [Competitive landscape](research/04-competitive-landscape.md)
 

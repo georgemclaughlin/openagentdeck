@@ -2,7 +2,7 @@
 
 [![The 8.8" strip display on its 3D-printed snap-clip desk stand](deskstand/out/8_readme.png)](deskstand/README.md)
 
-A native macOS app that turns a ~$110 touchscreen strip display (8.8" 480×1920 bar) into a live control deck for [Claude Code](https://code.claude.com): glanceable state for every running session, approve/deny from the strip, one-tap focus.
+A native macOS app that turns a touchscreen strip display (8.8" 480×1920 bar) into a live control deck for [Claude Code](https://code.claude.com): glanceable state for every running session, approve/deny from the strip, one-tap focus.
 
 > The human is now the bottleneck in agentic coding — and the fix deserves dedicated glass, not another window buried behind the terminal.
 
@@ -56,7 +56,11 @@ If you can no longer run the app, remove the entries by hand from `~/.claude/set
 
 ## Hardware
 
-The deck is designed for an 8.8" 1920x480 IPS touchscreen bar (typically $90-140 on Amazon; about $110 for the model it was built around). The model it was built around is a USB-C unit that carries power, DisplayPort video and touch over a single cable. Short version of the [hardware research](docs/research/02-strip-display-hardware.md):
+The deck is designed for an 8.8" 1920x480 IPS touchscreen bar. The model it was built around is a USB-C unit that carries power, DisplayPort video and touch over a single cable:
+
+![Amazon listing for the 8.8" 1920x480 Type-C touchscreen the deck was built around](docs/images/strip-display-listing.png)
+
+Short version of the [hardware research](docs/research/02-strip-display-hardware.md):
 
 - Buy a **true monitor**, not a "smart screen". Turing Smart Screen / TURZX units look the same but are USB-serial devices that a host program pushes images to; macOS does not see them as a display.
 - USB-C models need a **direct, full-featured USB-C port** (no hub, dock or adapter); on a desktop Mac use a rear Thunderbolt port. HDMI-plus-USB models also work for video.
