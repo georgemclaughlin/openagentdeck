@@ -1,0 +1,22 @@
+{
+  "question": "When a Claude Code question carries ASCII mockup previews (like this one), how should the deck's inspector lay them out?",
+  "header": "Preview UI",
+  "options": [
+    {
+      "label": "Focused preview below",
+      "description": "Compact option list on top, one full-width preview beneath that swaps as the selection moves. Gives the mockup the whole inspector width.",
+      "preview": "┌─ Question ─────────────────────────────┐\n│ Which header layout?                   │\n│                                        │\n│ ◉ 1. Compact  ○ 2. Tall  ○ 3. Split   │\n│ ────────────────────────────────────── │\n│ ┌────────────────────────────────────┐ │\n│ │ ▓▓ logo   nav ── nav ── nav     ⚙ │ │\n│ └────────────────────────────────────┘ │\n│ preview follows the selection          │\n│                                        │\n│ [ Other… ]                             │\n└────────────────────────────────────────┘"
+    },
+    {
+      "label": "Stacked inline",
+      "description": "Every option renders its mockup directly beneath its label, all visible at once. Nothing hidden, but three tall mockups make a long vertical scroll.",
+      "preview": "┌─ Question ─────────────────────────────┐\n│ Which header layout?                   │\n│                                        │\n│ ◉ 1. Compact                           │\n│   ┌──────────────────────────┐         │\n│   │ ▓▓ logo   nav ─ ─ ─   ⚙ │         │\n│   └──────────────────────────┘         │\n│ ○ 2. Tall                              │\n│   ┌──────────────────────────┐         │\n│   │        ▓▓▓▓ logo         │         │\n│   │    nav ── nav ── nav     │         │\n│   └──────────────────────────┘         │\n│ ○ 3. Split                             │\n│   ┌──────────────────────────┐         │\n│   │ ▓▓ │ nav          ⚙ 👤  │         │\n│   └──────────────────────────┘         │\n│                                        │\n│ [ Other… ]                             │\n└────────────────────────────────────────┘"
+    },
+    {
+      "label": "Side-by-side",
+      "description": "Option list on the left, preview pane on the right — the closest mirror of Claude Code's own terminal layout, but cramped at the inspector's 380–480pt width.",
+      "preview": "┌─ Question ─────────────────────────────┐\n│ Which header layout?                   │\n│                                        │\n│ ◉ 1. Compact  │ ┌──────────────────┐  │\n│ ○ 2. Tall     │ │ ▓▓ logo   nav  ⚙ │  │\n│ ○ 3. Split    │ │                  │  │\n│ ○ Other…      │ └──────────────────┘  │\n│               │  preview follows      │\n│               │  the selection        │\n└────────────────────────────────────────┘"
+    }
+  ],
+  "multiSelect": false
+}

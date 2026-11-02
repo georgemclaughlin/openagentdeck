@@ -1,0 +1,231 @@
+{
+ "params": {
+  "disp_w": 232.0,
+  "disp_h": 65.5,
+  "disp_t": 13.5,
+  "bezel": 5.0,
+  "disp_mass_g": 380.0,
+  "disp_edge_r": 0.3,
+  "angle": 60.0,
+  "clr": 0.35,
+  "relief_r": 0.8,
+  "lip_h": 2.5,
+  "lip_t": 3.5,
+  "lip_chamfer": 1.2,
+  "lip_draft": 22.0,
+  "back_t": 4.5,
+  "back_gap": 3.0,
+  "under_slot": 5.0,
+  "rear_angle": 50.0,
+  "tail_t": 4.0,
+  "base_rear": 60.0,
+  "foot_w": 18.0,
+  "foot_inset": 45.0,
+  "flex_len": 30.0,
+  "flex_t": 1.8,
+  "slot_w": 1.6,
+  "arm_t": 1.6,
+  "top_gap": 1.2,
+  "nose_ov": 1.75,
+  "nose_t": 2.2,
+  "nose_r": 0.25,
+  "tab": 3.0,
+  "tab_rise": 1.0,
+  "ramp_stop": 0.8,
+  "tab_t": 1.4,
+  "pla_E": 3000.0,
+  "pla_strain_max": 1.0,
+  "mu": 0.35,
+  "disp_h_tol": 0.5,
+  "rod_w": 8.0,
+  "rod_h": 5.0,
+  "rod_clr": 0.25,
+  "rod_rib": 0.1,
+  "rod_wall": 2.5,
+  "rod_overhang": 3.0,
+  "pad_d": 10.2,
+  "pad_depth": 0.6,
+  "pad_inset": 7.0,
+  "tunnel_chamfer": 0.6,
+  "line_w": 0.42,
+  "min_tip_N": 5.0,
+  "tip_margin": 1.15
+ },
+ "tip_force_N": 5.75,
+ "backrest_mm_per_N": 0.016,
+ "snap": {
+  "cases": {
+   "-0.5": {
+    "insert_tilt_deg": 14.0,
+    "lip_blocks_at_deg": 22.5,
+    "insert_margin_deg": 8.5,
+    "clip_lift_mm": 2.22,
+    "clip_force_N": 3.2,
+    "peak_strain_pct": 0.56,
+    "nose_backshift_mm": 1.29,
+    "first_contact_angle_deg": 41.1,
+    "seated_clear": true,
+    "tab_clearance_mm": 2.11
+   },
+   "+0.0": {
+    "insert_tilt_deg": 14.25,
+    "lip_blocks_at_deg": 22.5,
+    "insert_margin_deg": 8.25,
+    "clip_lift_mm": 2.69,
+    "clip_force_N": 3.8,
+    "peak_strain_pct": 0.68,
+    "nose_backshift_mm": 1.59,
+    "first_contact_angle_deg": 40.7,
+    "seated_clear": true,
+    "tab_clearance_mm": 1.62
+   },
+   "+0.5": {
+    "insert_tilt_deg": 14.5,
+    "lip_blocks_at_deg": 22.5,
+    "insert_margin_deg": 8.0,
+    "clip_lift_mm": 3.21,
+    "clip_force_N": 4.7,
+    "peak_strain_pct": 0.83,
+    "nose_backshift_mm": 1.92,
+    "first_contact_angle_deg": 40.4,
+    "seated_clear": true,
+    "tab_clearance_mm": 1.13
+   }
+  },
+  "overshoot_first_contact_deg": 40.0,
+  "nominal": {
+   "insert_tilt_deg": 14.25,
+   "lip_blocks_at_deg": 22.5,
+   "insert_margin_deg": 8.25,
+   "clip_lift_mm": 2.69,
+   "clip_force_N": 3.8,
+   "peak_strain_pct": 0.68,
+   "nose_backshift_mm": 1.59,
+   "first_contact_angle_deg": 40.7,
+   "seated_clear": true,
+   "tab_clearance_mm": 1.62
+  },
+  "worst": {
+   "clip_force_N": 4.7,
+   "peak_strain_pct": 0.83,
+   "first_contact_angle_deg": 40.4,
+   "insert_margin_deg": 8.0,
+   "seated_clear": true,
+   "tab_clearance_mm": 1.13
+  },
+  "kt_roots": [
+   1.38,
+   1.29
+  ]
+ },
+ "footprint_depth_mm": 95.6,
+ "height_mm": 74.5,
+ "fillets": [
+  [
+   2.0,
+   2.0
+  ],
+  [
+   0.5,
+   0.5
+  ],
+  [
+   0.5,
+   0.5
+  ],
+  [
+   0.5,
+   0.5
+  ],
+  [
+   0.8,
+   0.8
+  ],
+  [
+   0.8,
+   0.8
+  ],
+  [
+   0.79,
+   0.72
+  ],
+  [
+   0.79,
+   0.72
+  ],
+  [
+   1.0,
+   1.0
+  ],
+  [
+   0.25,
+   0.25
+  ],
+  [
+   1.0,
+   1.0
+  ],
+  [
+   1.5,
+   1.5
+  ],
+  [
+   3.0,
+   3.0
+  ],
+  [
+   8.0,
+   8.0
+  ],
+  [
+   2.0,
+   1.8
+  ],
+  [
+   1.0,
+   1.0
+  ]
+ ],
+ "mesh": {
+  "non_manifold_edges": 0,
+  "degenerate_faces": 0
+ },
+ "print": {
+  "foot_bbox_mm": [
+   74.5,
+   95.6,
+   18.0
+  ],
+  "rod_bbox_mm": [
+   166.0,
+   8.0,
+   5.0
+  ],
+  "est_grams_total": 52.5,
+  "est_minutes_total": 87
+ },
+ "plate_fits": true,
+ "checks": {
+  "tip-back force >= min_tip_N": true,
+  "display seats with no interference (display height +/-0.5 mm)": true,
+  "insertion tilt margin >= 4 deg before the lip blocks (display height +/-0.5 mm)": true,
+  "first clip contact >= 40 deg off head-on (display height +/-0.5 mm)": true,
+  "peak snap strain <= pla_strain_max over the sweep (display height +/-0.5 mm)": true,
+  "lip stays on the bezel (1 mm margin)": true,
+  "nose stays on the bezel (1 mm margin)": true,
+  "display flat face bears >= 0.75 mm on the hook's flat face (nominal)": true,
+  "display flat face bears >= 0.3 mm on the hook's flat face (display height +/-0.5 mm)": true,
+  "backrest gives <= 0.03 mm/N": true,
+  "spring + lip features >= 2 line widths": true,
+  "lip top land >= 2 line widths": true,
+  "ramp end >= 1.0 mm above the display corner's path (nominal)": true,
+  "ramp end >= 0.5 mm above the corner's path (display height +/-0.5 mm)": true,
+  "display 1.0 mm taller than nominal still meets the ramp at >= 30 deg": true,
+  "rod gripped: free gap between the crush ribs <= -0.1 mm": true,
+  "slot >= 2 line widths": true,
+  "every round >= 0.3 mm gets >= 90% of its radius": true,
+  "watertight mesh": true,
+  "plate layout fits the A1 mini bed": true
+ },
+ "PASS": true
+}

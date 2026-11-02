@@ -1,0 +1,68 @@
+{
+  "session_id": "7b373721-c090-461f-9bf5-d34c98e65453",
+  "transcript_path": "/Users/dev/.claude/projects/-Users-dev-workspace-openagentdeck/7b373721-c090-461f-9bf5-d34c98e65453.jsonl",
+  "cwd": "/Users/dev/workspace/openagentdeck",
+  "hook_event_name": "PreToolUse",
+  "tool_name": "AskUserQuestion",
+  "tool_use_id": "toolu_01WJu4rcdwf2kEPbsBkhZT8h",
+  "permission_mode": "plan",
+  "tool_input": {
+    "questions": [
+      {
+        "question": "Should the deck window be hard-capped in height (and the tall 'grid' layout removed), or stay free to grow tall on big displays?",
+        "header": "Height cap",
+        "multiSelect": false,
+        "options": [
+          {
+            "label": "Cap height, drop grid (Recommended)",
+            "description": "Window resizes freely in width but height is clamped to roughly 270–540 pt — it can never become a tall window. The grid layout (which only activates at ≥760 pt height and wraps cards to multiple rows) is deleted; the deck is always a strip."
+          },
+          {
+            "label": "Cap height, keep grid",
+            "description": "Same height clamp, but the grid code path stays for a possible future tall mode. Dead code on the strip, and the two-row wrap you screenshotted stays reachable if the cap is ever lifted."
+          },
+          {
+            "label": "No cap, keep grid",
+            "description": "Leave the window free; rely on you sizing it. The strip layout stays one of three modes rather than the product's shape."
+          }
+        ]
+      },
+      {
+        "question": "When a question arrives carrying ASCII mockup previews, where should it render on the strip?",
+        "header": "Preview stage",
+        "multiSelect": false,
+        "options": [
+          {
+            "label": "Full-strip takeover (Recommended)",
+            "description": "Preview-carrying questions temporarily own the whole strip — exactly like the terminal, where the dialog owns the screen. Options column left, mockup gets ~1300 pt of width. Cards return the moment you answer or dismiss.",
+            "preview": "┌────────────────────── 1920 × 480 ───────────────────────┐\n│ ? Preview UI — workspace/openagentdeck              [Esc ✕] │\n│ Which header layout?                                        │\n│                                                             │\n│ ◉ 1. Compact     ┌─────────────────────────────────┐ │\n│ ○ 2. Tall        │                                       │ │\n│ ○ 3. Split       │   ASCII mockup — full width,          │ │\n│                  │   no clipping, follows selection      │ │\n│ [ Other… ]      └─────────────────────────────────┘ │\n└────────────── cards hidden while it is open ────────────┘"
+          },
+          {
+            "label": "Stay in the inspector",
+            "description": "The question stays in the right-hand inspector column (380–760 pt) with a side-by-side layout inside it; cards remain visible but the mockup pane is ~300 pt and scrolls horizontally.",
+            "preview": "┌────────────────────── 1920 × 480 ───────────────────────┐\n│ ┌card┐ ┌card┐ ┌card┐        │ ? Preview UI                   │\n│ │    │ │    │ │    │        │ ◉ 1. Compact ┌───────────┐  │\n│ │    │ │    │ │    │        │ ○ 2. Tall    │ mockup pane │  │\n│ └────┘ └────┘ └────┘        │ ○ 3. Split   │ scrolls ↔   │  │\n│                             │ [ Other… ]   └───────────┘  │\n└─────────── cards stay visible, preview cramped ───────────┘"
+          }
+        ]
+      },
+      {
+        "question": "The titlebar currently spends ~52 pt on the title, session count, and usage readout. How much should we reclaim?",
+        "header": "Chrome",
+        "multiSelect": false,
+        "options": [
+          {
+            "label": "Compact system titlebar (Recommended)",
+            "description": "Switch to the unified-compact toolbar style — one ~38 pt row, keeps native traffic lights, drag, and toolbar behaviors. Cheap, safe, reversible."
+          },
+          {
+            "label": "Hide titlebar, custom header",
+            "description": "Hidden-titlebar window with our own strip header drawn into the content edge. Maximum height reclaimed (~10–15 pt more than compact), but we own drag regions, traffic-light placement, and fullscreen quirks."
+          },
+          {
+            "label": "Leave chrome as is",
+            "description": "Keep the current titlebar; spend the height budget elsewhere."
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+#!/bin/sh
+# Pre-push: the project's only gate (there is no CI).
+#   1. swift test: every unit test (DeckCoreTests, DeckAdaptersTests, DeckAppTests).
+#      SwiftPM runs them in-process, with no app launch and no Xcode test daemon.
+#   2. build-for-testing on the UITests plan: compiles the app and the UI tests,
+#      so neither can rot, but runs nothing.
+# The UI tests launch the app through XCUITest, which depends on macOS
+# automation approval and the testmanagerd daemon, so they only run on request:
+#   OAD_UI_TESTS=1 git push
+# Signing is forced to ad hoc so it works on any machine regardless of
+# Config/Local.xcconfig.
+# Enable once per clone:  git config core.hooksPath .githooks
+set -e
+cd "$(git rev-parse --show-toplevel)"
+# Apple's /usr/bin/git exports SDKROOT pointing at the Command Line Tools SDK,
+# which may not match the selected Xcode's compiler. Use the selected Xcode's.
+unset SDKROOT
+
+help() {
+  cat >&2 <<EOT
+
+✗ pre-push: stage "$1" failed. Push refused.
+
+  What to do:
+  1. Re-run it alone:  $2
+  2. Fix the cause at HEAD, commit, push again. The failing command's own output is above.
+  3. Passed on re-run with NO code change? That is a flake, not a pass: fix or quarantine the test. Never add retries.
+  4. Never \`git push --no-verify\` past a real failure: this hook is the only gate before the remote.
+EOT
+  exit 1
+}
+# stage <name> <command>: run one gate; on failure hand over to help.
+stage() {
+  echo "→ $1"
+  sh -c "$2" || help "$1" "$2"
+}
+
+SIGN="CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM="
+XC="xcodebuild -project OpenAgentDeck.xcodeproj -scheme OpenAgentDeck -destination platform=macOS"
+stage "unit tests (swift test)"                  "swift test --package-path Packages/DeckKit"
+stage "build app + UI tests (UITests plan)"      "$XC -testPlan UITests build-for-testing $SIGN"
+if [ "${OAD_UI_TESTS:-0}" = 1 ]; then
+  stage "UI tests (UITests plan)"                "$XC -testPlan UITests test-without-building"
+else
+  echo "  (UI tests skipped; run them with OAD_UI_TESTS=1 git push)"
+fi
+echo "✓ pre-push OK"

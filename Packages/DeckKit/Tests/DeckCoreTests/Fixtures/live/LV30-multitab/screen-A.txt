@@ -1,0 +1,9 @@
+Last login: Wed Jul 29 10:02:36 on ttys005
+dev@devbox project % claude --permission-mode default
+shell-init: error retrieving current directory: getcwd: cannot access parent directories: No such file or directory
+chdir: error retrieving current directory: getcwd: cannot access parent directories: No such file or directory
+chdir: error retrieving current directory: getcwd: cannot access parent directories: No such file or directory
+ENOENT: Bun could not find a file, and the code that produces this error is missing a better error.
+dev@devbox project % reply with exactly LV30ALPHA
+zsh: command not found: reply
+dev@devbox project % 

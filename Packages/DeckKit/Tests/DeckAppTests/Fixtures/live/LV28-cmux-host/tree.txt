@@ -1,0 +1,38 @@
+window window:1 [current] ◀ active
+├── workspace workspace:1 "✳ Fix login redirect"
+│   └── pane pane:1 [focused]
+│       ├── surface surface:2 [terminal] "✳ Add retry to upload client" [selected] tty=ttys002
+│       └── surface surface:1 [terminal] "~/workspace/alpha" tty=ttys003
+├── workspace workspace:2 "✳ Write migration for orders table"
+│   └── pane pane:2 [focused]
+│       └── surface surface:3 [terminal] "✳ Write migration for orders table" [selected] tty=ttys001
+├── workspace workspace:3 "~/workspace/echo"
+│   └── pane pane:3 [focused]
+│       └── surface surface:4 [terminal] "~/workspace/echo" [selected] tty=ttys012
+├── workspace workspace:4 "✳ Update changelog for release"
+│   └── pane pane:4 [focused]
+│       └── surface surface:5 [terminal] "✳ Update changelog for release" [selected] tty=ttys013
+├── workspace workspace:5 "✳ Debug flaky cache test"
+│   └── pane pane:5 [focused]
+│       ├── surface surface:6 [terminal] "~/workspace/notes" [selected] tty=ttys007
+│       └── surface surface:7 [terminal] "~/workspace/notes" tty=ttys008
+├── workspace workspace:6 "✳ Refactor settings parser and fix crashes"
+│   └── pane pane:6 [focused]
+│       └── surface surface:8 [terminal] "✳ Refactor settings parser and fix crashes" [selected] tty=ttys004
+├── workspace workspace:7 "⠂ Define keyboard shortcut handling goals"
+│   └── pane pane:7 [focused]
+│       └── surface surface:9 [terminal] "⠂ Define keyboard shortcut handling goals" [selected] ◀ here tty=ttys000
+├── workspace workspace:12 "LV27 probe" [selected] ◀ active
+│   └── pane pane:12 [focused] ◀ active
+│       └── surface surface:16 [terminal] "Terminal" [selected] ◀ active
+├── workspace workspace:8 "✳ Claude Code"
+│   └── pane pane:8 [focused]
+│       ├── surface surface:11 [terminal] "✳ Review pull request comments" [selected] tty=ttys009
+│       └── surface surface:10 [terminal] "~/workspace/charlie" tty=ttys010
+├── workspace workspace:9 "✳ Clone sample project and review build logs"
+│   └── pane pane:9 [focused]
+│       └── surface surface:12 [terminal] "✳ Clone sample project and review build logs" [selected] tty=ttys007
+└── workspace workspace:10 "✳ Generate API docs for service"
+    └── pane pane:10 [focused]
+        ├── surface surface:13 [terminal] "~/workspace/hotel" tty=ttys011
+        └── surface surface:14 [terminal] "~/workspace/india" [selected] tty=ttys012

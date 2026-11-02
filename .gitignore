@@ -1,0 +1,24 @@
+# macOS
+.DS_Store
+
+# Xcode
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+*.xcresult
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# Package.resolved is deliberately NOT ignored. This repository ships an
+# application, and an application's dependency versions are part of what makes
+# a build reproducible. (There are no external dependencies today, so the file
+# does not exist yet — the rule is here for the commit that adds the first one.)
+
+# Local-only
+Config/Local.xcconfig
+*.profraw
+.claude/
+__pycache__/

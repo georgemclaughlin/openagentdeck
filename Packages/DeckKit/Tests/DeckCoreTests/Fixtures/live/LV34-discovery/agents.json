@@ -1,0 +1,74 @@
+[
+  {
+    "pid": 52472,
+    "cwd": "/Users/owner/workspace/project0",
+    "kind": "interactive",
+    "startedAt": 1785020002669,
+    "sessionId": "00000000-0000-0000-0000-000000000000",
+    "name": "project0-a0",
+    "status": "busy"
+  },
+  {
+    "pid": 54074,
+    "cwd": "/Users/owner/workspace/project1",
+    "kind": "interactive",
+    "startedAt": 1785020023860,
+    "sessionId": "00000001-0000-0000-0000-000000000001",
+    "name": "project1-a1",
+    "status": "idle"
+  },
+  {
+    "pid": 55584,
+    "cwd": "/Users/owner/workspace/project2",
+    "kind": "interactive",
+    "startedAt": 1785020038387,
+    "sessionId": "00000002-0000-0000-0000-000000000002",
+    "name": "project2-a2",
+    "status": "idle"
+  },
+  {
+    "pid": 57958,
+    "cwd": "/Users/owner/workspace/project3",
+    "kind": "interactive",
+    "startedAt": 1785020057948,
+    "sessionId": "00000003-0000-0000-0000-000000000003",
+    "name": "project3-a3",
+    "status": "busy"
+  },
+  {
+    "pid": 67022,
+    "cwd": "/Users/owner/workspace/project4",
+    "kind": "interactive",
+    "startedAt": 1785020157836,
+    "sessionId": "00000004-0000-0000-0000-000000000004",
+    "name": "project4-a4",
+    "status": "waiting"
+  },
+  {
+    "pid": null,
+    "cwd": "/Users/owner/workspace/project5",
+    "kind": "background",
+    "startedAt": 1785023259988,
+    "sessionId": "00000005-0000-0000-0000-000000000005",
+    "name": "project5-a5",
+    "status": null
+  },
+  {
+    "pid": 25654,
+    "cwd": "/Users/owner/workspace/project6",
+    "kind": "interactive",
+    "startedAt": 1785463945518,
+    "sessionId": "00000006-0000-0000-0000-000000000006",
+    "name": "project6-a6",
+    "status": "idle"
+  },
+  {
+    "pid": 26624,
+    "cwd": "/Users/owner/workspace/project7",
+    "kind": "interactive",
+    "startedAt": 1785463955282,
+    "sessionId": "00000007-0000-0000-0000-000000000007",
+    "name": "project7-a7",
+    "status": "idle"
+  }
+]

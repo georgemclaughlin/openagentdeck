@@ -1,0 +1,12 @@
+⏺ Measuring the fixture pane…
+
+  A synthesized transcript line stands where the session's own words were.
+  A second synthesized line, for the same reason.
+
+  ❯ /surf-a
+
+───────────────────────────────────────────────────────────────────────────────────── deck-fixture-pane ───────────────
+❯ Press up to edit queued messages
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  main  |  /Users/surf/workspace/surf-a  |  ctx:11%                                                            /rc
+  ⏵⏵ bypass permissions on (shift+tab to cycle) · ← 1 agent

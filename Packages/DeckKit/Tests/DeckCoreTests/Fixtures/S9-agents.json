@@ -1,0 +1,76 @@
+[
+  {
+    "pid": 97277,
+    "cwd": "/Users/dev/workspace/alpha",
+    "kind": "interactive",
+    "startedAt": 1784400222548,
+    "sessionId": "0472f8ff-24ad-401f-94f3-d933d1d81689",
+    "name": "alpha-0e",
+    "status": "idle"
+  },
+  {
+    "pid": 98697,
+    "cwd": "/Users/dev/workspace/bravo",
+    "kind": "interactive",
+    "startedAt": 1784400236499,
+    "sessionId": "f23b7c68-23c3-4e63-a190-6ae1ca39a2f7",
+    "name": "bravo-e8",
+    "status": "idle"
+  },
+  {
+    "pid": 99847,
+    "cwd": "/Users/dev/workspace/foxtrot",
+    "kind": "interactive",
+    "startedAt": 1784400250112,
+    "sessionId": "c68fe820-58e3-41a1-9ff8-fc1b3c674062",
+    "name": "foxtrot-8c",
+    "status": "idle"
+  },
+  {
+    "pid": 46866,
+    "cwd": "/Users/dev/workspace/notes",
+    "kind": "interactive",
+    "startedAt": 1784421779572,
+    "sessionId": "48b8049d-d4a3-49dd-8427-37f7d2a8925f",
+    "name": "notes-95",
+    "status": "busy"
+  },
+  {
+    "pid": 4992,
+    "cwd": "/Users/dev/workspace/golf",
+    "kind": "interactive",
+    "startedAt": 1784574783073,
+    "sessionId": "5dc559f4-0ac1-4dee-9873-bcea5ea65e90",
+    "name": "golf-92",
+    "status": "idle"
+  },
+  {
+    "pid": 53116,
+    "cwd": "/Users/dev/workspace/delta",
+    "kind": "interactive",
+    "startedAt": 1784935191360,
+    "sessionId": "b7a3a0ab-39e2-4205-82fb-d04e27dbc315",
+    "name": "delta-27",
+    "status": "idle"
+  },
+  {
+    "pid": 88612,
+    "cwd": "/Users/dev/workspace/openagentdeck",
+    "kind": "interactive",
+    "startedAt": 1784935650445,
+    "sessionId": "293eb449-8bf1-4f22-a7b3-96a38ecd3135",
+    "name": "openagentdeck-81",
+    "status": "busy"
+  },
+  {
+    "pid": 36966,
+    "id": "6e4ef966",
+    "cwd": "/Users/dev/workspace/openagentdeck/spike/fixtures",
+    "kind": "background",
+    "startedAt": 1784963611053,
+    "sessionId": "6e4ef966-878e-4581-b2d1-66b23dd22618",
+    "name": "spike-bg",
+    "status": "busy",
+    "state": "working"
+  }
+]

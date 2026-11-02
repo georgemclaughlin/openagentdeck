@@ -1,0 +1,4 @@
+{
+  "statusLine": { "type": "command", "command": "npx ccusage statusline" },
+  "model": "claude-sonnet-5"
+}

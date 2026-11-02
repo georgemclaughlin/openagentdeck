@@ -1,0 +1,55 @@
+{
+  "configurations": [
+    {
+      "id": "6E7B1C10-0000-4000-A000-000000000001",
+      "name": "Default",
+      "options": {}
+    }
+  ],
+  "defaultOptions": {
+    "codeCoverage": {
+      "targets": [
+        {
+          "containerPath": "container:Packages/DeckKit",
+          "identifier": "DeckCore",
+          "name": "DeckCore"
+        },
+        {
+          "containerPath": "container:Packages/DeckKit",
+          "identifier": "DeckAdapters",
+          "name": "DeckAdapters"
+        },
+        {
+          "containerPath": "container:Packages/DeckKit",
+          "identifier": "DeckApp",
+          "name": "DeckApp"
+        }
+      ]
+    },
+    "testExecutionOrdering": "random"
+  },
+  "testTargets": [
+    {
+      "target": {
+        "containerPath": "container:Packages/DeckKit",
+        "identifier": "DeckCoreTests",
+        "name": "DeckCoreTests"
+      }
+    },
+    {
+      "target": {
+        "containerPath": "container:Packages/DeckKit",
+        "identifier": "DeckAdaptersTests",
+        "name": "DeckAdaptersTests"
+      }
+    },
+    {
+      "target": {
+        "containerPath": "container:Packages/DeckKit",
+        "identifier": "DeckAppTests",
+        "name": "DeckAppTests"
+      }
+    }
+  ],
+  "version": 1
+}

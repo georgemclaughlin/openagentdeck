@@ -1,0 +1,39 @@
+[
+  {
+    "id": "e27976e1",
+    "cwd": "/Users/dev/workspace/openagentdeck/spike/fixtures",
+    "kind": "background",
+    "startedAt": 1785023259988,
+    "sessionId": "e27976e1-40fb-4cc5-8417-dc6f1725fb96",
+    "name": "spike-fail",
+    "state": "blocked"
+  },
+  {
+    "pid": 8559,
+    "cwd": "/Users/dev/workspace/alpha",
+    "kind": "interactive",
+    "startedAt": 1785970955804,
+    "sessionId": "f4ddc6c4-0134-4941-ab0e-6ddc0ed0b24f",
+    "name": "alpha-b5",
+    "status": "waiting",
+    "waitingFor": "permission prompt"
+  },
+  {
+    "pid": 63716,
+    "cwd": "/Users/dev/workspace/bravo",
+    "kind": "interactive",
+    "startedAt": 1785971678334,
+    "sessionId": "beab4f5b-d6eb-4a6e-b259-05bad5be62f8",
+    "name": "bravo-02",
+    "status": "idle"
+  },
+  {
+    "pid": 38293,
+    "cwd": "/Users/dev/workspace/openagentdeck",
+    "kind": "interactive",
+    "startedAt": 1785973893061,
+    "sessionId": "7b373721-c090-461f-9bf5-d34c98e65453",
+    "name": "openagentdeck-58",
+    "status": "busy"
+  }
+]

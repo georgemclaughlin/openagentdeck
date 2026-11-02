@@ -1,0 +1,33 @@
+Third-party colour palettes
+===========================
+
+OpenAgentDeck ships five themes transcribed from published editor colour
+schemes. Hex values are facts and carry no copyright; attribution is given
+because the communities that maintain these palettes have earned it, and
+because a check against the canonical hex values makes each upstream the source
+of record for its theme — a corrected hex upstream is a corrected hex here.
+
+Catppuccin (Mocha)
+  https://github.com/catppuccin/palette · MIT License
+  Theme: "Catppuccin Mocha" (catppuccin-mocha)
+
+Rosé Pine (Moon, with Main's base as a registered cross-variant borrow)
+  https://github.com/rose-pine/rose-pine-theme · MIT License
+  Theme: "Rosé Pine Moon" (rose-pine-moon)
+
+Everforest (Dark, hard contrast)
+  https://github.com/sainnhe/everforest · MIT License
+  Theme: "Everforest Dark Hard" (everforest-dark-hard)
+
+Kanagawa (Wave)
+  https://github.com/rebelot/kanagawa.nvim · MIT License
+  Theme: "Kanagawa Wave" (kanagawa-wave)
+
+Tokyo Night (Storm)
+  https://github.com/folke/tokyonight.nvim · Apache License 2.0
+  (The palette's origin repository, enkia/tokyo-night-vscode-theme, declares
+  no SPDX licence; folke's port is this project's source of record.)
+  Theme: "Tokyo Night Storm" (tokyo-night-storm)
+
+The sixth theme, "Ember" (ember), is OpenAgentDeck's own house palette,
+transcribed from its UX design document, and carries the project's licence.

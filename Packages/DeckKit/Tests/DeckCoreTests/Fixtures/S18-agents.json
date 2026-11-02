@@ -1,0 +1,76 @@
+[
+  {
+    "id": "6e4ef966",
+    "cwd": "/Users/dev/workspace/openagentdeck/spike/fixtures",
+    "kind": "background",
+    "startedAt": 1784963610287,
+    "sessionId": "6e4ef966-878e-4581-b2d1-66b23dd22618",
+    "name": "spike-bg",
+    "state": "done"
+  },
+  {
+    "pid": 52472,
+    "cwd": "/Users/dev/workspace/openagentdeck",
+    "kind": "interactive",
+    "startedAt": 1785020002669,
+    "sessionId": "293eb449-8bf1-4f22-a7b3-96a38ecd3135",
+    "name": "openagentdeck-f1",
+    "status": "busy"
+  },
+  {
+    "pid": 54074,
+    "cwd": "/Users/dev/workspace/bravo",
+    "kind": "interactive",
+    "startedAt": 1785020023860,
+    "sessionId": "c07a90b5-34ea-4002-b1e9-c8855d1d577f",
+    "name": "bravo-c4",
+    "status": "idle"
+  },
+  {
+    "pid": 55584,
+    "cwd": "/Users/dev/workspace/alpha",
+    "kind": "interactive",
+    "startedAt": 1785020038387,
+    "sessionId": "de05720e-acfe-4b42-99c4-7db8260cdf7b",
+    "name": "alpha-8b",
+    "status": "idle"
+  },
+  {
+    "pid": 57958,
+    "cwd": "/Users/dev/workspace/delta",
+    "kind": "interactive",
+    "startedAt": 1785020057948,
+    "sessionId": "b7a3a0ab-39e2-4205-82fb-d04e27dbc315",
+    "name": "delta-b9",
+    "status": "idle"
+  },
+  {
+    "id": "7163e116",
+    "cwd": "/Users/dev/workspace/openagentdeck/spike/fixtures",
+    "kind": "background",
+    "startedAt": 1785020086080,
+    "sessionId": "7163e116-0938-4f21-b8ce-d0e0a5f06cca",
+    "name": "spike-q",
+    "state": "done"
+  },
+  {
+    "pid": 67022,
+    "cwd": "/Users/dev/workspace/charlie",
+    "kind": "interactive",
+    "startedAt": 1785020157836,
+    "sessionId": "383fbc4c-be76-4ae4-8626-8a122d89acf4",
+    "name": "charlie-c5",
+    "status": "busy"
+  },
+  {
+    "pid": 20745,
+    "id": "e27976e1",
+    "cwd": "/Users/dev/workspace/openagentdeck/spike/fixtures",
+    "kind": "background",
+    "startedAt": 1785023902658,
+    "sessionId": "e27976e1-40fb-4cc5-8417-dc6f1725fb96",
+    "name": "spike-fail",
+    "status": "idle",
+    "state": "blocked"
+  }
+]

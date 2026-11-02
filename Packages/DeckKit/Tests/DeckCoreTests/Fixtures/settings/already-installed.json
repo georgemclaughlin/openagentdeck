@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "x-openagentdeck": true,
+        "matcher": "*",
+        "hooks": [
+          { "type": "command", "command": "curl -s -X POST http://127.0.0.1:8765/hook" }
+        ]
+      }
+    ]
+  },
+  "model": "claude-opus-5"
+}

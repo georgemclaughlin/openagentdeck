@@ -1,0 +1,14 @@
+// Signing defaults for Open Agent Deck (committed).
+//
+// Out of the box the app is signed ad hoc ("Sign to Run Locally"), which needs
+// no Apple Developer account and is enough to build and run on your own Mac.
+//
+// To sign with your own team instead, copy Local.xcconfig.example to
+// Local.xcconfig (git-ignored) and edit it. Anything set there overrides the
+// defaults below.
+
+CODE_SIGN_STYLE = Manual
+CODE_SIGN_IDENTITY = -
+DEVELOPMENT_TEAM =
+
+#include? "Local.xcconfig"

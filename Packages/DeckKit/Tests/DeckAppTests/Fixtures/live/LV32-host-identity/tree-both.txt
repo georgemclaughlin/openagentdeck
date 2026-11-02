@@ -1,0 +1,40 @@
+window window:1 6A004E5D-9728-43F0-98B9-51C3B4B989BA [current] ◀ active
+├── workspace workspace:1 B393B27C-B157-4D88-B10D-881B6BEFD637 "✳ Fix login redirect"
+│   └── pane pane:1 2A9132B2-3D26-4F67-A8B1-930EAB645B21 [focused]
+│       ├── surface surface:2 218A54E9-5DDD-4FE0-BF36-D044B0A50B93 [terminal] "⠂ Add retry to upload client" [selected] tty=ttys002
+│       └── surface surface:1 75CAFA77-6414-452E-83D1-0DC67E528FFA [terminal] "~/workspace/alpha" tty=ttys003
+├── workspace workspace:2 20055205-F888-4DBC-9DDC-9945D204F33B "✳ Write migration for orders table"
+│   └── pane pane:2 D76C4ACF-3B52-468D-BA7E-F3FC27F7B127 [focused]
+│       └── surface surface:3 9F1B18ED-3A5A-478E-9FE9-8CD879471FFE [terminal] "✳ Write migration for orders table" [selected] tty=ttys001
+├── workspace workspace:3 F3D1A093-CA24-4227-ADD1-2A1F01CFB82E "~/workspace/echo"
+│   └── pane pane:3 013FE494-AE44-449F-AAEB-10C5B55F0ED9 [focused]
+│       └── surface surface:4 3ED265A4-27A7-4BC1-A564-2C4DCBAB6C52 [terminal] "~/workspace/echo" [selected] tty=ttys012
+├── workspace workspace:4 F4478064-CE31-4393-85DA-A71D3364E9C8 "✳ Update changelog for release"
+│   └── pane pane:4 47002195-32F3-429E-8B2E-222C9A0FD6AB [focused]
+│       └── surface surface:5 4C2E1BEB-31C9-4C06-9457-4959CC025E00 [terminal] "✳ Update changelog for release" [selected] tty=ttys013
+├── workspace workspace:5 F28049E4-6610-4A74-A996-FFA49BDD6B6B "✳ Debug flaky cache test"
+│   └── pane pane:5 D1C3F174-EEA0-499A-A51B-9A61ADEDBF2D [focused]
+│       ├── surface surface:6 B578C7DE-E630-4263-9623-C401009F7E74 [terminal] "~/workspace/notes" [selected] tty=ttys007
+│       └── surface surface:7 2DA581C0-7D84-4771-8E17-A549516A1A51 [terminal] "~/workspace/notes" tty=ttys008
+├── workspace workspace:6 96CD1810-1099-4B53-809A-24663BA25352 "✳ Refactor settings parser and fix crashes"
+│   └── pane pane:6 B3415299-A44B-4B11-AD58-D1B9FD34034F [focused]
+│       └── surface surface:8 40B34423-7F64-47A0-A404-4C2FE61D88F2 [terminal] "✳ Refactor settings parser and fix crashes" [selected] tty=ttys004
+├── workspace workspace:7 E116179D-4FC4-4B25-BBDD-31A101C00069 "⠂ Define keyboard shortcut handling goals" [selected] ◀ active
+│   └── pane pane:7 9A68038E-DA50-4290-92B0-4B07269BDD16 [focused] ◀ active
+│       └── surface surface:9 616E2DFC-7513-4895-A535-4455FF164C18 [terminal] "⠂ Define keyboard shortcut handling goals" [selected] ◀ active ◀ here tty=ttys000
+├── workspace workspace:19 53CC87D4-D5CD-449C-826C-4D496C368C2A "Deck hands-on"
+│   └── pane pane:19 D662140D-6927-44F7-AED3-F975151CDE4D [focused]
+│       ├── surface surface:27 7BB88BAA-6151-4BED-950D-81A33DFA27C6 [terminal] "✳ Claude Code" [selected] tty=ttys005
+│       ├── surface surface:28 9B7D957A-FA5E-49CD-9772-B62BA533F7AC [terminal] "✳ Claude Code" tty=ttys006
+│       └── surface surface:29 2B15D266-AC05-4D18-85C9-0DB3C3F2AAC4 [terminal] "…/results/hands-on/project" tty=ttys011
+├── workspace workspace:8 25E90B31-50A4-4D97-9231-FC36CA462A71 "✳ Claude Code"
+│   └── pane pane:8 B94FC052-791A-47D9-BA2A-39F4448CD6E1 [focused]
+│       ├── surface surface:11 582DA168-9EAF-4C18-B998-2228496CECF5 [terminal] "✳ Review pull request comments" [selected] tty=ttys009
+│       └── surface surface:10 F88DE0DA-5559-4C83-A77B-CF63C7FFAEA8 [terminal] "~/workspace/charlie" tty=ttys010
+├── workspace workspace:9 A1DFF1D9-74A4-4500-980D-06DAF14FAC20 "✳ Clone sample project and review build logs"
+│   └── pane pane:9 5A6AF6D6-4F1F-439F-9F90-6D14808853A7 [focused]
+│       └── surface surface:12 61DFA83D-11B0-41CE-AC4D-3EC6ADB8D27D [terminal] "✳ Clone sample project and review build logs" [selected] tty=ttys007
+└── workspace workspace:10 03AB7592-479A-4319-96A7-CB0C797A5E53 "✳ Generate API docs for service"
+    └── pane pane:10 40542449-AB5B-4700-B850-2B8311FADC54 [focused]
+        ├── surface surface:13 ADF462E3-7A7C-4DEB-B90F-B990C00BB370 [terminal] "~/workspace/hotel" tty=ttys011
+        └── surface surface:14 39DADDDD-FECF-4D11-ADA8-FA59C258CE9D [terminal] "~/workspace/india" [selected] tty=ttys012

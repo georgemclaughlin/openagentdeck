@@ -1,0 +1,711 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open Agent Deck — Strip UI State Board</title>
+<style>
+  /* ---------- board (matting) ---------- */
+  :root{
+    --paper:#EFEBE2; --paper-ink:#1E1A14; --paper-dim:#7A7264; --paper-line:#DDD6C8;
+    /* strip tokens */
+    --bg:#16130F; --lane:#201C16; --well:#120F0B; --hair:#2E2820;
+    --ink:#EDE6D6; --dim:#9A9080; --faint:#787060;
+    --blue:#5E9EE6; --amber:#FFB13D; --green:#57C785; --red:#E8604C; --idle:#6B6558;
+    --coral:#D97757;
+    --sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",sans-serif;
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--paper);color:var(--paper-ink);font-family:var(--sans);padding:56px 48px 96px}
+  .head{max-width:1280px;margin:0 auto 12px}
+  .head .eyebrow{font-size:12px;letter-spacing:.14em;color:var(--paper-dim);text-transform:uppercase}
+  .head h1{font-size:34px;font-weight:650;letter-spacing:-.01em;margin:6px 0 8px}
+  .head p{font-size:15px;line-height:1.55;color:#4A4438;max-width:760px}
+  .tokens{max-width:1280px;margin:26px auto 0;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .chip{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--paper-dim);
+        border:1px solid var(--paper-line);border-radius:999px;padding:6px 12px 6px 7px;background:#F6F3EC}
+  .chip i{width:16px;height:16px;border-radius:50%;display:block}
+  .section{max-width:1280px;margin:64px auto 0}
+  .section .eyebrow{font-size:12px;letter-spacing:.14em;color:var(--paper-dim);text-transform:uppercase}
+  .section h2{font-size:21px;font-weight:650;margin:6px 0 6px}
+  .section .note{font-size:14px;line-height:1.55;color:#4A4438;max-width:760px;margin-bottom:18px}
+  .frame{border:1px solid var(--paper-line);border-radius:10px;padding:14px;background:#F6F3EC;
+         box-shadow:0 1px 0 rgba(30,26,20,.04)}
+  .fit{width:100%}
+  .fit .strip{transform-origin:top left}
+  .dims{font-size:11px;color:var(--paper-dim);margin-top:10px;letter-spacing:.06em}
+
+  /* ---------- the strip itself (true 1920x480) ---------- */
+  .strip{width:1920px;height:480px;background:var(--bg);border-radius:14px;overflow:hidden;
+         display:flex;color:var(--ink);font-family:var(--sans);position:relative}
+
+  /* mast */
+  .mast{width:150px;flex:none;display:flex;flex-direction:column;align-items:center;
+        justify-content:space-between;padding:30px 0 26px;border-right:1px solid var(--hair)}
+  .glyph{width:46px;height:46px;border-radius:12px;background:var(--lane);
+         box-shadow:inset 0 0 0 1px var(--hair);
+         display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--dim);font-weight:700}
+  .attn{display:flex;flex-direction:column;align-items:center;gap:4px}
+  .attn .n{font-size:76px;font-weight:300;line-height:1;color:var(--amber);letter-spacing:-.02em}
+  .attn .l{font-size:15px;letter-spacing:.10em;color:var(--amber);opacity:.85}
+  .attn.clear .n{color:var(--faint);font-size:44px;font-weight:400}
+  .attn.clear .l{color:var(--faint)}
+  /* peek lanes: clip like the real UI, never ellipsize into fragments */
+  .lane.peek .pname,.lane.peek .branch{overflow:visible;text-overflow:clip}
+  .tally{display:flex;flex-direction:column;align-items:center;gap:8px}
+  .tally .dots{display:flex;gap:7px}
+  .tally .dots i{width:10px;height:10px;border-radius:50%;display:block}
+  .tally .l{font-size:15px;letter-spacing:.10em;color:var(--dim)}
+
+  /* lanes region */
+  .lanes{flex:1;display:flex;gap:12px;padding:14px 0 14px 14px;overflow:hidden;position:relative}
+  .lane{width:470px;flex:none;background:var(--lane);border-radius:12px;display:flex;overflow:hidden;position:relative}
+  .bar{width:16px;flex:none}
+  .lane .body{flex:1;padding:26px 28px 22px;display:flex;flex-direction:column;justify-content:space-between;min-width:0}
+  .rowA{display:flex;align-items:center;gap:14px;min-width:0}
+  .pglyph{width:40px;height:40px;border-radius:10px;flex:none;display:flex;align-items:center;justify-content:center;
+          font-size:19px;font-weight:700;color:#16130F;position:relative}
+  .badge{position:absolute;top:-7px;right:-7px;width:24px;height:24px;border-radius:50%;
+         display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#16130F}
+  .pname{font-size:34px;font-weight:600;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .branch{font-family:var(--mono);font-size:22px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+  .act{display:flex;align-items:baseline;justify-content:space-between;gap:16px}
+  .act .t{font-size:26px;color:var(--ink);opacity:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .act .el{font-size:22px;color:var(--dim);font-variant-numeric:tabular-nums;flex:none}
+  .meters{display:flex;align-items:center;gap:22px}
+  .mlabel{font-size:15px;letter-spacing:.08em;color:var(--faint)}
+  .ctx{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+  .ctxbar{height:8px;border-radius:4px;background:var(--well);flex:1;overflow:hidden}
+  .ctxbar i{display:block;height:100%;border-radius:4px;background:var(--faint)}
+  .ctxpct{font-size:20px;color:var(--dim);font-variant-numeric:tabular-nums}
+  .cost{font-size:20px;color:var(--dim);font-variant-numeric:tabular-nums;flex:none}
+  .effort{display:flex;gap:5px;align-items:center;flex:none}
+  .effort i{width:8px;height:8px;border-radius:50%;background:var(--faint)}
+  .effort i.on{background:var(--dim)}
+
+  /* fuel */
+  .fuel{width:190px;flex:none;border-left:1px solid var(--hair);display:flex;flex-direction:column;
+        align-items:center;justify-content:space-between;padding:26px 0 22px}
+  /* fuel = REMAINING budget: drains as you spend; red ≤10% left, neutral otherwise — amber is reserved for attention */
+  .gauge{width:54px;height:250px;border-radius:10px;background:var(--well);overflow:hidden;display:flex;align-items:flex-end}
+  .gauge i{display:block;width:100%;background:var(--dim)}
+  .gauge.crit i{background:var(--red)}  /* no amber here — amber is reserved for attention */
+  .fuel .pct{font-size:54px;font-weight:300;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums}
+  .fuel .cap{font-size:15px;letter-spacing:.10em;color:var(--faint);margin-top:6px}
+  .fuel .sub{font-size:20px;color:var(--dim);font-variant-numeric:tabular-nums;text-align:center;line-height:1.5}
+
+  /* state colors + motion */
+  .working .bar{background:var(--blue);animation:breathe 3.6s ease-in-out infinite}
+  .working.p2 .bar{animation-delay:-1.4s}
+  .working.p3 .bar{animation-delay:-2.6s}
+  /* compressed neighbors during a takeover */
+  .lane.slim{width:200px} .lane.slim .act,.lane.slim .meters{display:none}
+  .lane.mini{width:330px} .lane.mini .meters{display:none}
+  .done .bar{background:var(--green)}
+  .error .bar{background:var(--red)}
+  .idlest .bar{background:var(--idle)}
+  .waiting .bar{background:var(--amber);animation:pulse 1.2s ease-in-out infinite}
+  .waiting{box-shadow:inset 0 0 0 1px rgba(255,177,61,.28)}
+  .waiting .pglyph .badge{background:var(--amber)}
+  @keyframes breathe{0%,100%{opacity:.55}50%{opacity:1}}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+  @media (prefers-reduced-motion: reduce){
+    .working .bar{animation:none;opacity:.7}
+    .waiting .bar,.approval .bar,.question .bar{animation:none;opacity:1}
+  }
+
+  /* edge glow (attention off-screen) */
+  .edgeglow{position:absolute;top:0;right:0;width:64px;height:100%;pointer-events:none;
+            background:linear-gradient(270deg,rgba(255,177,61,.34),rgba(255,177,61,0));
+            animation:pulse 1.2s ease-in-out infinite}
+  .edgeglow .arr{position:absolute;right:14px;top:50%;transform:translateY(-50%);
+                 font-size:30px;color:var(--amber)}
+
+  /* approval takeover — read on top, act at bottom */
+  .lane.approval{width:940px;background:#241D12;box-shadow:inset 0 0 0 1px rgba(255,177,61,.35)}
+  .approval .bar{background:var(--amber);animation:pulse 1.2s ease-in-out infinite}
+  .approval .body{padding:24px 30px 20px;justify-content:flex-start;gap:16px}
+  .aphead{display:flex;align-items:center;gap:14px}
+  .aphead .who{font-size:27px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .aphead .who span{font-family:var(--mono);font-size:21px;color:var(--dim);font-weight:400}
+  .nextchip{flex:none;margin-left:auto;font-size:15px;letter-spacing:.08em;color:var(--dim);
+            border:1px solid var(--hair);border-radius:999px;padding:7px 14px;background:var(--well)}
+  .well{background:var(--well);border-radius:12px;padding:18px 24px 20px;min-width:0;
+        display:flex;flex-direction:column;gap:12px}
+  .wellhead{display:flex;align-items:center;gap:12px}
+  .wellhead .fb{margin-left:auto;font-size:19px;color:var(--dim)}
+  .wellhead .fb b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+  .toolchip{font-size:15px;letter-spacing:.10em;color:var(--amber);
+            border:1px solid rgba(255,177,61,.4);border-radius:6px;padding:4px 10px}
+  .wants{font-size:15px;letter-spacing:.10em;color:var(--dim)}
+  .cmd{font-family:var(--mono);font-size:38px;color:var(--ink);white-space:pre-wrap;word-break:break-all}
+  .apact{display:flex;align-items:center;justify-content:flex-end;gap:14px;margin-top:auto}
+  .btn{width:260px;height:110px;border-radius:14px;display:flex;flex-direction:column;align-items:center;
+       justify-content:center;font-size:28px;font-weight:650;letter-spacing:.06em;flex:none}
+  .btn.deny{border:2px solid rgba(232,96,76,.55);color:var(--red);background:rgba(232,96,76,.07)}
+  .btn.allow{background:var(--amber);color:#16130F}
+  .btn .hint{font-size:17px;font-weight:500;letter-spacing:.03em;margin-top:6px}
+  .timeline{position:absolute;top:0;left:16px;right:0;height:5px;background:var(--well)}
+  .timeline i{display:block;height:100%;width:76%;background:linear-gradient(90deg,rgba(255,177,61,.3),var(--amber));
+              border-radius:0 3px 3px 0}
+
+  /* question takeover — same skeleton, options are the actions */
+  .lane.question{width:940px;background:#241D12;box-shadow:inset 0 0 0 1px rgba(255,177,61,.35)}
+  .question .bar{background:var(--amber);animation:pulse 1.2s ease-in-out infinite}
+  .question .body{padding:22px 30px 18px;justify-content:flex-start;gap:13px}
+  .qwell{background:var(--well);border-radius:12px;padding:16px 24px 18px;display:flex;flex-direction:column;gap:10px}
+  .qtext{font-size:32px;font-weight:500;color:var(--ink);line-height:1.25}
+  .opts{display:flex;gap:14px;align-items:stretch;margin-top:auto}
+  .opt{flex:1;min-width:0;background:#2A241C;border:1px solid var(--hair);border-radius:14px;height:110px;
+       display:flex;flex-direction:column;justify-content:center;padding:0 22px;gap:5px}
+  .opt .ol{font-size:26px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .opt .od{font-size:17px;color:var(--dim);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;
+           -webkit-box-orient:vertical;overflow:hidden}
+  .opt.ghost{background:transparent}
+  .opt.ghost .ol{color:var(--dim)}
+  /* 4–6 targets: fixed 3×2 grid, 90px rows */
+  .opts.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:auto}
+  .opts.grid .opt{height:90px;padding:0 20px;gap:3px}
+  .opts.grid .opt .od{-webkit-line-clamp:1}
+  .opt.sel{box-shadow:inset 0 0 0 2px var(--amber)}
+  .opt.sel .ol{color:var(--amber)}
+  .opt.done{background:var(--amber);align-items:center;justify-content:center;padding:0}
+  .opt.done .ol{color:#16130F;letter-spacing:.06em}
+
+  /* lights-out */
+  .strip.dark{background:#0B0906}
+  .dark .lo-bar{position:absolute;top:14px;bottom:14px;width:16px;border-radius:8px}
+  .dark .lo-bar .bar{box-shadow:0 0 28px 2px currentColor}
+  .dark .lo-bar.working{color:rgba(94,158,230,.5)}
+  .dark .ghost{position:absolute;right:44px;bottom:28px;text-align:right;color:#4A4436}
+  .dark .ghost .clock{font-size:44px;font-weight:300;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+  .dark .ghost .blk{font-size:15px;letter-spacing:.10em;margin-top:4px}
+
+  /* first run */
+  .steps{flex:1;display:flex;gap:14px;padding:14px;align-items:stretch}
+  .step{flex:1;background:var(--lane);border-radius:12px;padding:30px 34px;display:flex;
+        flex-direction:column;gap:16px}
+  .step .k{font-size:15px;letter-spacing:.10em;color:var(--faint)}
+  .step .t{font-size:31px;font-weight:600;line-height:1.25;letter-spacing:-.01em}
+  .step .s{font-size:21px;color:var(--dim);line-height:1.45}
+  .step .ok{color:var(--green);font-size:26px}
+  .bigbtn{align-self:flex-start;background:var(--coral);color:#16130F;font-size:27px;font-weight:650;
+          border-radius:14px;padding:22px 34px;letter-spacing:.02em}
+  .step .fine{font-size:18px;color:var(--dim);line-height:1.45;margin-top:auto}
+
+  /* legend */
+  .legend{display:flex;gap:12px}
+  .lg{flex:1;background:var(--bg);border-radius:12px;overflow:hidden;display:flex;color:var(--ink);height:120px}
+  .lg .bar{width:12px}
+  .lg .b{padding:16px 18px;display:flex;flex-direction:column;gap:6px;justify-content:center}
+  .lg .n{font-size:19px;font-weight:600}
+  .lg .m{font-size:13px;color:var(--dim);line-height:1.4}
+</style>
+
+<div class="head">
+  <div class="eyebrow">Open Agent Deck · design/strip-states · v0.3.2</div>
+  <h1>Strip UI — state board</h1>
+  <p>Every frame below is the real canvas: 1920×480 px on an 8.8″ bar (8.78 px/mm), scaled to fit this page.
+     Type is shown in system SF; the shipping app uses SF Pro / SF Mono natively. Motion is live where your
+     browser allows it — working lanes breathe, waiting lanes pulse.</p>
+  <div class="tokens">
+    <span class="chip"><i style="background:#16130F"></i>umber black · bg</span>
+    <span class="chip"><i style="background:#EDE6D6;border:1px solid #ccc"></i>ivory · ink</span>
+    <span class="chip"><i style="background:#5E9EE6"></i>working</span>
+    <span class="chip"><i style="background:#FFB13D"></i>needs you</span>
+    <span class="chip"><i style="background:#57C785"></i>done</span>
+    <span class="chip"><i style="background:#E8604C"></i>error</span>
+    <span class="chip"><i style="background:#6B6558"></i>idle</span>
+    <span class="chip"><i style="background:#D97757"></i>coral · brand, used once</span>
+  </div>
+</div>
+
+<!-- ============ A. LIVE FLEET ============ -->
+<div class="section">
+  <div class="eyebrow">Live fleet · the default hour</div>
+  <h2>Three sessions working, nothing needs you</h2>
+  <p class="note">Lanes hold stable positions (start order). The mast reads “all clear”; the fourth lane peeks to
+     teach scrollability. Light bars breathe out of phase — a rack of machines, not a dashboard.</p>
+  <div class="frame"><div class="fit"><div class="strip">
+    <div class="mast">
+      <div class="glyph">◆</div>
+      <div class="attn clear"><div class="n">✓</div><div class="l">ALL CLEAR</div></div>
+      <div class="tally">
+        <div class="dots"><i style="background:var(--blue)"></i><i style="background:var(--blue)"></i><i style="background:var(--green)"></i><i style="background:var(--idle)"></i></div>
+        <div class="l">4 SESSIONS</div>
+      </div>
+    </div>
+    <div class="lanes">
+      <div class="lane working">
+        <div class="bar"></div>
+        <div class="body">
+          <div class="rowA">
+            <div class="pglyph" style="background:#8FB4A3">c</div>
+            <div style="min-width:0">
+              <div class="pname">checkout-api</div>
+              <div class="branch">fix/idempotency-keys</div>
+            </div>
+          </div>
+          <div class="act"><div class="t">Editing payments/retry.ts ⋯</div><div class="el">2m 14s</div></div>
+          <div class="meters">
+            <div class="ctx"><span class="mlabel">CTX</span><div class="ctxbar"><i style="width:41%"></i></div><span class="ctxpct">41%</span></div>
+            <span class="cost">$1.84</span>
+            <span class="mlabel">SONNET</span><div class="effort"><i class="on"></i><i class="on"></i><i></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="lane working p2">
+        <div class="bar"></div>
+        <div class="body">
+          <div class="rowA">
+            <div class="pglyph" style="background:#B4A38F">w</div>
+            <div style="min-width:0">
+              <div class="pname">web</div>
+              <div class="branch">feat/nav-redesign</div>
+            </div>
+          </div>
+          <div class="act"><div class="t">Running pnpm test --filter nav ⋯</div><div class="el">48s</div></div>
+          <div class="meters">
+            <div class="ctx"><span class="mlabel">CTX</span><div class="ctxbar"><i style="width:68%"></i></div><span class="ctxpct">68%</span></div>
+            <span class="cost">$0.62</span>
+            <span class="mlabel">OPUS</span><div class="effort"><i class="on"></i><i class="on"></i><i class="on"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="lane done">
+        <div class="bar"></div>
+        <div class="body">
+          <div class="rowA">
+            <div class="pglyph" style="background:#93A6B8">i<span class="badge" style="background:var(--green)">✓</span></div>
+            <div style="min-width:0">
+              <div class="pname">infra-terraform</div>
+              <div class="branch">main</div>
+            </div>
+          </div>
+          <div class="act"><div class="t">Opened PR #412 · tests green</div><div class="el">4m ago</div></div>
+          <div class="meters">
+            <div class="ctx"><span class="mlabel">CTX</span><div class="ctxbar"><i style="width:72%"></i></div><span class="ctxpct">72%</span></div>
+            <span class="cost">$3.10</span>
+            <span class="mlabel">SONNET</span><div class="effort"><i class="on"></i><i class="on"></i><i></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="lane idlest peek">
+        <div class="bar"></div>
+        <div class="body">
+          <div class="rowA">
+            <div class="pglyph" style="background:#A29B8B">d</div>
+            <div style="min-width:0"><div class="pname">dotfiles</div><div class="branch">main</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="fuel">
+      <div>
+        <div class="pct">38<span style="font-size:26px;color:var(--dim)">%</span></div>
+        <div class="cap">BLOCK LEFT</div>
+      </div>
+      <div class="gauge"><i style="height:38%"></i></div>
+      <div class="sub">resets 2:11<br>today $11.40</div>
+    </div>
+  </div></div>
+  <div class="dims">1920 × 480 · mast 150 · lanes 470 + 12 gap · fuel 190</div></div>
+</div>
+
+<!-- ============ B. APPROVAL TAKEOVER ============ -->
+<div class="section">
+  <div class="eyebrow">Approval takeover · the climax</div>
+  <h2>Minutes after frame A: web wants to force-push. Read it, tap once.</h2>
+  <p class="note">Same fleet, same order — checkout compresses at left, web expands <em>in its own position</em>, infra
+     queues behind with its remaining countdown. Reading on top, acting at the bottom: the command spans the full card
+     width, verbatim, wrapping rather than clipping; Deny and Allow are 260×110 px targets that arm 250 ms after the
+     animation settles; holding Allow writes a scoped always-rule. The hairline on top is the 120 s hook budget
+     draining; on expiry the deck defers to the terminal, honestly labeled. Tapping the queued lane or the NEXT chip
+     promotes that request instead — urgency is the user's call.</p>
+  <div class="frame"><div class="fit"><div class="strip">
+    <div class="mast">
+      <div class="glyph">◆</div>
+      <div class="attn"><div class="n">2</div><div class="l">WAITING</div></div>
+      <div class="tally">
+        <div class="dots"><i style="background:var(--blue)"></i><i style="background:var(--amber)"></i><i style="background:var(--amber)"></i><i style="background:var(--idle)"></i></div>
+        <div class="l">4 SESSIONS</div>
+      </div>
+    </div>
+    <div class="lanes">
+      <div class="lane working slim peek">
+        <div class="bar"></div>
+        <div class="body">
+          <div class="rowA">
+            <div class="pglyph" style="background:#8FB4A3">c</div>
+            <div style="min-width:0"><div class="pname">checkout-api</div><div class="branch">fix/idempotency-keys</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="lane approval">
+        <div class="bar"></div>
+        <div class="timeline"><i></i></div>
+        <div class="body">
+          <div class="aphead">
+            <div class="pglyph" style="background:#B4A38F">w<span class="badge" style="background:var(--amber)">!</span></div>
+            <div class="who">web <span>· feat/nav-redesign</span></div>
+            <div class="nextchip">NEXT: infra-terraform</div>
+          </div>
+          <div class="well">
+            <div class="wellhead"><span class="toolchip">BASH</span><span class="wants">WANTS TO RUN</span>
+              <span class="fb">falls back to terminal in <b>1:32</b></span></div>
+            <div class="cmd">$ git push --force origin main</div>
+          </div>
+          <div class="apact">
+            <div class="btn deny">DENY</div>
+            <div class="btn allow">ALLOW<span class="hint">hold — always allow</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="lane waiting mini">
+        <div class="bar"></div>
+        <div class="body">
+          <div class="rowA">
+            <div class="pglyph" style="background:#93A6B8">i<span class="badge">!</span></div>
+            <div style="min-width:0">
+              <div class="pname">infra-terraform</div>
+              <div class="branch">main</div>
+            </div>
+          </div>
+          <div class="act"><div class="t">Waiting — Edit main.tf</div><div class="el">term 0:41</div></div>
+        </div>
+      </div>
+      <div class="lane idlest peek"><div class="bar"></div><div class="body"><div class="rowA">
+        <div class="pglyph" style="background:#A29B8B">d</div>
+        <div style="min-width:0"><div class="pname">dotfiles</div></div>
+      </div></div></div>
+    </div>
+    <div class="fuel">
+      <div>
+        <div class="pct">38<span style="font-size:26px;color:var(--dim)">%</span></div>
+        <div class="cap">BLOCK LEFT</div>
+      </div>
+      <div class="gauge"><i style="height:38%"></i></div>
+      <div class="sub">resets 2:11<br>today $11.40</div>
+    </div>
+  </div></div>
+  <div class="dims">takeover lane 940 · neighbors compress to 200 / 330 · deny/allow 260×110 · command 38px SF Mono, full width, wraps, never clipped · queued lane shows remaining 0:41, not elapsed · arm delay 250 ms (400 on advance)</div></div>
+</div>
+
+<!-- ============ B2. QUESTION TAKEOVER ============ -->
+<div class="section">
+  <div class="eyebrow">Question takeover · the second payload</div>
+  <h2>Claude asks; the options are the buttons</h2>
+  <p class="note">AskUserQuestion arrives on the same held-hook channel as approvals — same skeleton, different payload.
+     The well reads (header chip + question), the bottom row acts: one tap answers a single-select after the standard
+     arm delay; multiSelect toggles with a DONE confirm; “Other…” is free text, so it releases the hold and focuses the
+     session’s frontend — this session lives in the Claude Code desktop app, and the countdown says so. There is no
+     Deny: an unanswered question has no destructive branch.</p>
+  <div class="frame"><div class="fit"><div class="strip">
+    <div class="mast">
+      <div class="glyph">◆</div>
+      <div class="attn"><div class="n">1</div><div class="l">WAITING</div></div>
+      <div class="tally">
+        <div class="dots"><i style="background:var(--blue)"></i><i style="background:var(--amber)"></i><i style="background:var(--blue)"></i><i style="background:var(--idle)"></i></div>
+        <div class="l">4 SESSIONS</div>
+      </div>
+    </div>
+    <div class="lanes">
+      <div class="lane working slim peek">
+        <div class="bar"></div>
+        <div class="body">
+          <div class="rowA">
+            <div class="pglyph" style="background:#8FB4A3">c</div>
+            <div style="min-width:0"><div class="pname">checkout-api</div><div class="branch">fix/idempotency-keys</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="lane question">
+        <div class="bar"></div>
+        <div class="timeline"><i style="width:87%"></i></div>
+        <div class="body">
+          <div class="aphead">
+            <div class="pglyph" style="background:#B4A38F">w<span class="badge" style="background:var(--amber)">?</span></div>
+            <div class="who">web <span>· feat/nav-redesign</span></div>
+          </div>
+          <div class="qwell">
+            <div class="wellhead"><span class="toolchip">ASKS</span><span class="wants">AUTH METHOD</span>
+              <span class="fb">falls back to the app in <b>1:44</b></span></div>
+            <div class="qtext">Which auth approach should I use for the API routes?</div>
+          </div>
+          <div class="opts">
+            <div class="opt"><div class="ol">JWT middleware</div><div class="od">Stateless, works with the edge cache</div></div>
+            <div class="opt"><div class="ol">Session cookies</div><div class="od">Simpler, matches the admin app</div></div>
+            <div class="opt ghost"><div class="ol">Other…</div><div class="od">Answer in the app</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="lane working p2 mini">
+        <div class="bar"></div>
+        <div class="body">
+          <div class="rowA">
+            <div class="pglyph" style="background:#93A6B8">i</div>
+            <div style="min-width:0"><div class="pname">infra-terraform</div><div class="branch">main</div></div>
+          </div>
+          <div class="act"><div class="t">Deploying preview ⋯</div><div class="el">3m 12s</div></div>
+        </div>
+      </div>
+      <div class="lane idlest peek"><div class="bar"></div><div class="body"><div class="rowA">
+        <div class="pglyph" style="background:#A29B8B">d</div>
+        <div style="min-width:0"><div class="pname">dotfiles</div></div>
+      </div></div></div>
+    </div>
+    <div class="fuel">
+      <div>
+        <div class="pct">37<span style="font-size:26px;color:var(--dim)">%</span></div>
+        <div class="cap">BLOCK LEFT</div>
+      </div>
+      <div class="gauge"><i style="height:37%"></i></div>
+      <div class="sub">resets 2:07<br>today $11.68</div>
+    </div>
+  </div></div>
+  <div class="dims">options ≈278×110 each, label 26px + description 17px ×2 lines · targets counted as options + Other + DONE: 1–3 one row, 4–6 fixed 3×2 grid (never scrolls) · single-select resolves in one tap (250 ms arm) · ? badge is a redundant channel; the well content is the distinguisher</div></div>
+</div>
+
+<!-- ============ B3. QUESTION GRID / MULTISELECT ============ -->
+<div class="section">
+  <div class="eyebrow">Question grid · the documented maximum</div>
+  <h2>Four options, multiSelect, question 2 of 3 — six targets, six cells</h2>
+  <p class="note">The worst case the schema allows: 4 options + Other + DONE = six targets in the fixed 3×2 grid of
+     90 px rows (10.3 mm — a declared exception to the 110 px single-row floor, still far above the 64 px minimum).
+     Staging is selected (amber ring + ✓), so DONE is armed; with nothing selected DONE renders disabled as hairline +
+     dim ink — never faint. The stepper reads 2 OF 3 in the well head; advancing re-arms targets at 400 ms, the 120 s
+     budget spans all three questions, and answers ship together after the last. Demoting this takeover keeps the hold;
+     re-promotion restarts at question 1.</p>
+  <div class="frame"><div class="fit"><div class="strip">
+    <div class="mast">
+      <div class="glyph">◆</div>
+      <div class="attn"><div class="n">1</div><div class="l">WAITING</div></div>
+      <div class="tally">
+        <div class="dots"><i style="background:var(--blue)"></i><i style="background:var(--amber)"></i><i style="background:var(--blue)"></i><i style="background:var(--idle)"></i></div>
+        <div class="l">4 SESSIONS</div>
+      </div>
+    </div>
+    <div class="lanes">
+      <div class="lane working slim peek">
+        <div class="bar"></div>
+        <div class="body">
+          <div class="rowA">
+            <div class="pglyph" style="background:#8FB4A3">c</div>
+            <div style="min-width:0"><div class="pname">checkout-api</div><div class="branch">fix/idempotency-keys</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="lane question">
+        <div class="bar"></div>
+        <div class="timeline"><i style="width:62%"></i></div>
+        <div class="body">
+          <div class="aphead">
+            <div class="pglyph" style="background:#B4A38F">w<span class="badge" style="background:var(--amber)">?</span></div>
+            <div class="who">web <span>· feat/nav-redesign</span></div>
+          </div>
+          <div class="qwell">
+            <div class="wellhead"><span class="toolchip">ASKS</span><span class="wants">CANARY ROLLOUT · 2 OF 3</span>
+              <span class="fb">falls back to the app in <b>1:12</b></span></div>
+            <div class="qtext" style="font-size:28px">Which environments should the canary deploy touch first?</div>
+          </div>
+          <div class="opts grid">
+            <div class="opt sel"><div class="ol">✓ Staging</div><div class="od">Mirrors prod topology</div></div>
+            <div class="opt"><div class="ol">Prod US-East</div><div class="od">Largest traffic share</div></div>
+            <div class="opt"><div class="ol">Prod EU</div><div class="od">Strictest latency SLO</div></div>
+            <div class="opt"><div class="ol">Edge workers</div><div class="od">Fastest rollback</div></div>
+            <div class="opt ghost"><div class="ol">Other…</div><div class="od">Answer in the app</div></div>
+            <div class="opt done"><div class="ol">DONE</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="lane working p2 mini">
+        <div class="bar"></div>
+        <div class="body">
+          <div class="rowA">
+            <div class="pglyph" style="background:#93A6B8">i</div>
+            <div style="min-width:0"><div class="pname">infra-terraform</div><div class="branch">main</div></div>
+          </div>
+          <div class="act"><div class="t">Deploying preview ⋯</div><div class="el">4m 40s</div></div>
+        </div>
+      </div>
+      <div class="lane idlest peek"><div class="bar"></div><div class="body"><div class="rowA">
+        <div class="pglyph" style="background:#A29B8B">d</div>
+        <div style="min-width:0"><div class="pname">dotfiles</div></div>
+      </div></div></div>
+    </div>
+    <div class="fuel">
+      <div>
+        <div class="pct">37<span style="font-size:26px;color:var(--dim)">%</span></div>
+        <div class="cap">BLOCK LEFT</div>
+      </div>
+      <div class="gauge"><i style="height:37%"></i></div>
+      <div class="sub">resets 2:05<br>today $11.74</div>
+    </div>
+  </div></div>
+  <div class="dims">grid cells ≈278×90 (10.3 mm rows, declared exception) · order: options → Other → DONE final cell · DONE disabled = hairline + dim ink #9A9080, never faint · stepper advance re-arms 400 ms · budget hairline spans the whole call</div></div>
+</div>
+
+<!-- ============ C. ATTENTION ROUTING ============ -->
+<div class="section">
+  <div class="eyebrow">Attention routing · nothing moves without you</div>
+  <h2>A session you can’t see needs you</h2>
+  <p class="note">Lanes never reorder themselves. When a waiting session is scrolled off-screen, the mast counts it and
+     the screen edge glows amber on that side. Tap either — the row scrolls there; the takeover expands only once its
+     command is readable.</p>
+  <div class="frame"><div class="fit"><div class="strip">
+    <div class="mast">
+      <div class="glyph">◆</div>
+      <div class="attn"><div class="n">1</div><div class="l">WAITING</div></div>
+      <div class="tally">
+        <div class="dots"><i style="background:var(--blue)"></i><i style="background:var(--blue)"></i><i style="background:var(--green)"></i><i style="background:var(--idle)"></i><i style="background:var(--amber)"></i></div>
+        <div class="l">5 SESSIONS</div>
+      </div>
+    </div>
+    <div class="lanes">
+      <div class="lane working">
+        <div class="bar"></div>
+        <div class="body">
+          <div class="rowA">
+            <div class="pglyph" style="background:#8FB4A3">c</div>
+            <div style="min-width:0"><div class="pname">checkout-api</div><div class="branch">fix/idempotency-keys</div></div>
+          </div>
+          <div class="act"><div class="t">Reading 6 files ⋯</div><div class="el">18s</div></div>
+          <div class="meters">
+            <div class="ctx"><span class="mlabel">CTX</span><div class="ctxbar"><i style="width:44%"></i></div><span class="ctxpct">44%</span></div>
+            <span class="cost">$1.91</span>
+            <span class="mlabel">SONNET</span><div class="effort"><i class="on"></i><i class="on"></i><i></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="lane working p2">
+        <div class="bar"></div>
+        <div class="body">
+          <div class="rowA">
+            <div class="pglyph" style="background:#B4A38F">w</div>
+            <div style="min-width:0"><div class="pname">web</div><div class="branch">feat/nav-redesign</div></div>
+          </div>
+          <div class="act"><div class="t">Writing NavMenu.test.tsx ⋯</div><div class="el">1m 03s</div></div>
+          <div class="meters">
+            <div class="ctx"><span class="mlabel">CTX</span><div class="ctxbar"><i style="width:69%"></i></div><span class="ctxpct">69%</span></div>
+            <span class="cost">$0.71</span>
+            <span class="mlabel">OPUS</span><div class="effort"><i class="on"></i><i class="on"></i><i class="on"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="lane done">
+        <div class="bar"></div>
+        <div class="body">
+          <div class="rowA">
+            <div class="pglyph" style="background:#93A6B8">i<span class="badge" style="background:var(--green)">✓</span></div>
+            <div style="min-width:0"><div class="pname">infra-terraform</div><div class="branch">main</div></div>
+          </div>
+          <div class="act"><div class="t">Opened PR #412 · tests green</div><div class="el">9m ago</div></div>
+          <div class="meters">
+            <div class="ctx"><span class="mlabel">CTX</span><div class="ctxbar"><i style="width:72%"></i></div><span class="ctxpct">72%</span></div>
+            <span class="cost">$3.10</span>
+            <span class="mlabel">SONNET</span><div class="effort"><i class="on"></i><i class="on"></i><i></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="lane idlest peek"><div class="bar"></div><div class="body"><div class="rowA">
+        <div class="pglyph" style="background:#A29B8B">d</div>
+        <div style="min-width:0"><div class="pname">dotfiles</div></div>
+      </div></div></div>
+      <div class="edgeglow"><span class="arr">›</span></div>
+    </div>
+    <div class="fuel">
+      <div>
+        <div class="pct">36<span style="font-size:26px;color:var(--dim)">%</span></div>
+        <div class="cap">BLOCK LEFT</div>
+      </div>
+      <div class="gauge"><i style="height:36%"></i></div>
+      <div class="sub">resets 2:03<br>today $11.92</div>
+    </div>
+  </div></div>
+  <div class="dims">edge glow 64px, pulses in phase with the waiting lane it points to</div></div>
+</div>
+
+<!-- ============ D. LIGHTS OUT ============ -->
+<div class="section">
+  <div class="eyebrow">Lights-out · desk jewelry, honestly</div>
+  <h2>90 seconds of calm and the deck becomes its status lights</h2>
+  <p class="note">No waiting sessions, no touch — the UI fades to black and only the light bars remain, breathing in
+     place at each lane’s true position. Any touch or any state change wakes it; a needs-you always wakes it. This is
+     the Codex Micro’s one universally loved feature, kept alive between glances.</p>
+  <div class="frame"><div class="fit"><div class="strip dark">
+    <div class="lo-bar working" style="left:164px"><div class="bar" style="height:100%;border-radius:8px"></div></div>
+    <div class="lo-bar working p2" style="left:646px"><div class="bar" style="height:100%;border-radius:8px"></div></div>
+    <div class="lo-bar" style="left:1128px"><div class="bar" style="height:100%;border-radius:8px;background:var(--green);opacity:.7"></div></div>
+    <div class="lo-bar" style="left:1610px"><div class="bar" style="height:100%;border-radius:8px;background:var(--idle);opacity:.5"></div></div>
+    <div class="ghost">
+      <div class="clock">23:41</div>
+      <div class="blk">38% LEFT · RESETS 2:11</div>
+    </div>
+  </div></div>
+  <div class="dims">bars remain at lane x-positions — spatial memory survives the fade</div></div>
+</div>
+
+<!-- ============ E. FIRST RUN ============ -->
+<div class="section">
+  <div class="eyebrow">First run · zero-config magic</div>
+  <h2>Three steps, one consentful tap</h2>
+  <p class="note">The deck detects Claude Code, asks once to install its hooks — previewing the exact settings.json
+     change on the main display before writing — then waits for any session to appear. Coral’s only
+     appearance.</p>
+  <div class="frame"><div class="fit"><div class="strip">
+    <div class="mast">
+      <div class="glyph">◆</div>
+      <div class="attn clear"><div class="n">—</div><div class="l">SETUP</div></div>
+      <div class="tally"><div class="l">v0.3.2</div></div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="k">FOUND</div>
+        <div class="t">Claude Code <span class="ok">✓</span></div>
+        <div class="s">v2.1.211 at ~/.claude<br>4 recent projects</div>
+      </div>
+      <div class="step">
+        <div class="k">CONNECT</div>
+        <div class="t">Let sessions report to the deck</div>
+        <div class="bigbtn">Install deck hooks</div>
+        <div class="fine">Shows the exact settings.json change on your main screen first. Removable anytime in Settings.</div>
+      </div>
+      <div class="step">
+        <div class="k">GO</div>
+        <div class="t">Start a session in any terminal</div>
+        <div class="s">It shows up here the moment it starts. Nothing else to configure.</div>
+      </div>
+    </div>
+  </div></div>
+  <div class="dims">settings preview renders on the main display — the strip never asks you to read a diff at 55 mm tall</div></div>
+</div>
+
+<!-- ============ LEGEND ============ -->
+<div class="section">
+  <div class="eyebrow">State vocabulary · color is never alone</div>
+  <h2>Annunciator legend</h2>
+  <p class="note">Every state pairs color with a distinct motion pattern and a badge glyph, so the vocabulary survives
+     color-blindness and Reduce Motion (which swaps animation for static opacity steps).</p>
+  <div class="legend">
+    <div class="lg"><div class="bar" style="background:var(--blue);animation:breathe 3.6s ease-in-out infinite"></div>
+      <div class="b"><div class="n">Working</div><div class="m">breathes 3.6 s · ⋯ in activity line</div></div></div>
+    <div class="lg"><div class="bar" style="background:var(--amber);animation:pulse 1.2s ease-in-out infinite"></div>
+      <div class="b"><div class="n">Needs you</div><div class="m">pulses 1.2 s · ! / ? badge · counts on mast</div></div></div>
+    <div class="lg"><div class="bar" style="background:var(--green)"></div>
+      <div class="b"><div class="n">Done</div><div class="m">blooms once · ✓ badge · fades after 10 m</div></div></div>
+    <div class="lg"><div class="bar" style="background:var(--red)"></div>
+      <div class="b"><div class="n">Error</div><div class="m">solid — errors don’t dance · ✕ badge</div></div></div>
+    <div class="lg"><div class="bar" style="background:var(--idle)"></div>
+      <div class="b"><div class="n">Idle</div><div class="m">still · dims to lights-out</div></div></div>
+  </div>
+</div>
+
+<script>
+  // scale every 1920px strip to its container width
+  function fit(){
+    document.querySelectorAll('.fit').forEach(w=>{
+      const s=w.querySelector('.strip'), k=w.clientWidth/1920;
+      s.style.transform='scale('+k+')';
+      w.style.height=(480*k)+'px';
+    });
+  }
+  addEventListener('resize',fit); fit();
+</script>

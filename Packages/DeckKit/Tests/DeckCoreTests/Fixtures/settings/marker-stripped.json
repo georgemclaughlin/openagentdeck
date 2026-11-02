@@ -1,0 +1,32 @@
+{
+  "model": "opusplan",
+  "effortLevel": "high",
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "curl -s --max-time 5 -X POST --data-binary @- \"http://127.0.0.1:8765/hook?surface=${CMUX_SURFACE_ID:-}&workspace=${CMUX_WORKSPACE_ID:-}\" || true"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "curl -s --max-time 5 -X POST --data-binary @- \"http://127.0.0.1:8765/hook?surface=${CMUX_SURFACE_ID:-}&workspace=${CMUX_WORKSPACE_ID:-}\" || true"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "d=$(mktemp \"${TMPDIR:-/tmp}/openagentdeck-statusline.XXXXXX\"); cat > \"$d\"; curl -s --max-time 3 -X POST --data-binary @\"$d\" http://127.0.0.1:8765/statusline > /dev/null 2>&1; exec < \"$d\"; rm -f \"$d\"; sh ~/.claude/statusline-command.sh"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "configurations": [
+    {
+      "id": "6E7B1C10-0000-4000-A000-000000000002",
+      "name": "Default",
+      "options": {}
+    }
+  ],
+  "defaultOptions": {
+    "testRepetitionMode": "retryOnFailure",
+    "maximumTestRepetitions": 3,
+    "testTimeoutsEnabled": true,
+    "maximumTestExecutionTimeAllowance": 120
+  },
+  "testTargets": [
+    {
+      "target": {
+        "containerPath": "container:OpenAgentDeck.xcodeproj",
+        "identifier": "AA00000000000000000020",
+        "name": "OpenAgentDeckUITests"
+      }
+    }
+  ],
+  "version": 1
+}
