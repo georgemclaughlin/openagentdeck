@@ -166,6 +166,88 @@ class MonitorTests(unittest.TestCase):
             result = subprocess.run([sys.executable, script] + args, capture_output=True)
             self.assertEqual(result.returncode, 2)
 
+    def test_richer_records_exclude_instructions_reasoning_and_raw_tool_output(self):
+        self.path.write_bytes(record("session_meta", id="rich", cwd="/projects/deck",
+                                     git={"branch": "feature/cards"})
+                              + record("response_item", type="message", role="developer",
+                                       content=[{"type": "input_text", "text": "SECRET instructions"}])
+                              + record("response_item", type="message", role="user", content=[
+                                  {"type": "input_text", "text": "<environment_context>setup</environment_context>"}])
+                              + record("response_item", type="message", role="user", content=[
+                                  {"type": "input_text", "text": "Add session details"}])
+                              + record("response_item", type="reasoning", summary="SECRET reasoning")
+                              + record("response_item", type="message", role="assistant", phase="analysis",
+                                       content=[{"type": "output_text", "text": "SECRET internal message"}])
+                              + record("response_item", type="function_call", name="run_tests",
+                                       arguments="SECRET argument")
+                              + record("response_item", type="function_call_output", output="SECRET output")
+                              + record("response_item", type="message", role="assistant", phase="final_answer",
+                                       content=[{"type": "output_text", "text": "The details are ready."}]))
+        row = read_session(self.path)
+        self.assertEqual(row.branch, "feature/cards")
+        self.assertEqual(row.last_prompt, "Add session details")
+        self.assertEqual(row.last_activity, "The details are ready.")
+        self.assertEqual([a.kind for a in row.recent], ["user", "tool", "assistant"])
+        self.assertNotIn("SECRET", repr(row))
+
+    def test_item_completed_messages_and_errors(self):
+        self.path.write_bytes(self.header + event("item_completed", item={
+            "type": "UserMessage", "content": [{"type": "Text", "text": "Check the API"}]})
+            + event("item_completed", item={"type": "CommandExecution", "status": "failed",
+                                           "exit_code": 2, "aggregated_output": "SECRET output"})
+            + event("item_completed", item={"type": "AgentMessage", "phase": "commentary",
+                                           "content": "The command failed."})
+            + event("task_complete", error={"message": "Network unavailable"}))
+        row = read_session(self.path)
+        self.assertEqual(row.last_prompt, "Check the API")
+        self.assertEqual(row.error, "Network unavailable")
+        self.assertIn("Command: failed (exit 2)", [a.text for a in row.recent])
+        self.assertNotIn("SECRET", repr(row))
+        reduce_record(row, {"type": "event_msg", "payload": {"type": "task_started"}})
+        self.assertEqual(row.error, "")
+
+    def test_history_is_bounded_and_duplicate_message_is_suppressed(self):
+        self.path.write_bytes(self.header + b"".join(event("agent_message", message=f"Update {i}") for i in range(30))
+                              + event("agent_message", message="Update 29"))
+        row = read_session(self.path)
+        self.assertEqual(len(row.recent), 12)
+        self.assertEqual(row.recent[-1].text, "Update 29")
+        self.assertEqual(row.recent[0].text, "Update 18")
+
+    def test_message_controls_are_removed_and_long_setup_is_not_a_prompt(self):
+        self.path.write_bytes(self.header + event("user_message", message="<environment_context>" + "x" * 5000)
+                              + event("agent_message", message="Hi\nthere\x1b[2J\u202e" + "x" * 5000))
+        row = read_session(self.path)
+        self.assertEqual(row.last_prompt, "")
+        self.assertEqual(len(row.recent), 1)
+        self.assertLessEqual(len(row.recent[0].text), 2000)
+        self.assertNotIn("\x1b", row.recent[0].text)
+        self.assertIn("\n", row.recent[0].text)
+
+    def test_title_updates_without_rollout_changes(self):
+        sessions = self.root / "sessions"
+        sessions.mkdir()
+        self.path.rename(sessions / self.path.name)
+        index = self.root / "session_index.jsonl"
+        index.write_text(json.dumps({"id": "test-session", "thread_name": "Original title"}) + "\n")
+        monitor = Monitor(sessions)
+        self.assertEqual(monitor.snapshot()[0].title, "Original title")
+        with index.open("a") as stream:
+            stream.write(json.dumps({"id": "test-session", "thread_name": "Renamed title"}) + "\n")
+        self.assertEqual(monitor.snapshot()[0].title, "Renamed title")
+        index.unlink()
+        self.assertEqual(monitor.snapshot()[0].title, "")
+
+    def test_old_pin_is_included_outside_the_recent_candidate_window(self):
+        self.path.unlink()
+        for i in range(105):
+            path = self.root / f"rollout-session-{i}.jsonl"
+            path.write_bytes(record("session_meta", id=f"session-{i}"))
+            os.utime(path, (1000 + i, 1000 + i))
+        monitor = Monitor(self.root)
+        self.assertEqual(monitor.snapshot(limit=1)[0].id, "session-104")
+        self.assertEqual(monitor.snapshot(limit=1, preferred_ids={"session-0"})[0].id, "session-0")
+
 
 if __name__ == "__main__":
     unittest.main()

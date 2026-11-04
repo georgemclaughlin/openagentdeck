@@ -12,11 +12,44 @@ python3 linux/dashboard.py                  # graphical strip dashboard
 python3 linux/dashboard.py --demo           # synthetic data, without reading sessions
 python3 linux/monitor.py                    # refresh in a terminal; Ctrl+C exits
 python3 linux/monitor.py --once             # one snapshot
-python3 linux/monitor.py --json             # structured snapshot for a future GUI
+python3 linux/monitor.py --json             # structured snapshot, including message previews
 python3 linux/monitor.py --include-subagents
 python3 linux/monitor.py --sessions-dir /path/to/codex/sessions
 python3 -m unittest discover -s linux -v
 ```
+
+## Session cards and details
+
+![Codex session cards showing project, branch, task and activity; synthetic demo data](images/overview.png)
+
+Cards show the project, recorded branch, session title (or latest available
+prompt), state, freshness, and a recent activity preview. Tap anywhere on a card
+to open its details. Titles come from Codex's `session_index.jsonl` when present;
+title changes appear even when the session's rollout has not changed.
+
+![Expanded session showing recent messages and Pin/Hide controls; synthetic demo data](images/details.png)
+
+The detail view shows up to 12 recent messages/activity records, newest first,
+plus the latest observed prompt or error if it has fallen out of that list. Use
+**Older/Newer**, the scrollbar, or the mouse wheel to read more. Text is selectable
+and read-only. While browsing older messages, updates wait until you return to
+the top so the text does not jump under you. **Back** or **Esc** returns to the cards; Esc from the overview
+leaves fullscreen.
+
+- **Pin / Unpin:** keep an important session ahead of unpinned cards. Pins are
+  session-specific. Standard rollout filenames let the scanner find older pinned
+  sessions outside its usual recent-file shortlist, within the 48-session limit.
+- **Hide:** remove a session from the main view without touching it in Codex.
+- **Hidden:** browse hidden sessions still in the current scan. Tap one and use
+  **Show again** to restore it. **Restore all** also clears hidden IDs for sessions
+  outside the scan.
+
+Choices survive restarts in `$XDG_CONFIG_HOME/openagentdeck/preferences.json`
+(normally `~/.config/openagentdeck/preferences.json`). Only session IDs and deck
+preferences are saved, not prompts or replies. Writes replace the file atomically.
+An unreadable or invalid existing file is left untouched and reported in the UI.
+Use `--preferences-file /path/to/preferences.json` to choose another location.
+Demo mode keeps its choices in memory and never writes preferences.
 
 ## Put the dashboard on the USB-C strip
 
@@ -24,7 +57,7 @@ python3 -m unittest discover -s linux -v
    settings, extend the desktop and rotate the strip to **1920 × 480 landscape**.
    The panel reports its native mode as **480 × 1920**, so rotation is expected.
 2. Run `python3 linux/dashboard.py`, drag the window onto the strip, then tap
-   **Fullscreen** or press **F11**. **Esc** returns to a normal window; **Exit**
+   **Fullscreen** or press **F11**. From the overview, **Esc** returns to a normal window; **Exit**
    closes the dashboard. The bottom arrows page through sessions.
 3. Check that a tap on an arrow activates that arrow. If touch lands on the main
    display, map the touchscreen to the strip in your desktop environment.
@@ -67,8 +100,9 @@ touch mapping set to that display. To return that device to automatic mapping:
 gsettings reset org.gnome.desktop.peripherals.touchscreen:/org/gnome/desktop/peripherals/touchscreens/1a86:e5e3/ output
 ```
 
-The graphical view shows up to 48 recent root sessions, four per page at strip
-width. Fresh working observations sort first. Updates are read on a background
+The graphical view shows up to 48 root sessions, four per page at strip
+width. Pins sort first, then fresh working observations. Hidden sessions still
+count toward the scan limit. Updates are read on a background
 thread so filesystem scanning does not block touch interaction. It shares the
 terminal monitor's observation semantics and limitations below.
 
@@ -85,14 +119,21 @@ every two seconds; `--interval`, `--limit`, and `--stale-after` are configurable
   recorded observation, not proof of a live process. A silent long-running turn
   and a crashed process cannot be distinguished from these files alone.
 - **Project/model:** recorded working directory and model, when available.
+- **Branch/title/prompt:** recorded metadata and message previews, not a live Git
+  query. A branch can be old; absent titles fall back to the latest prompt observed
+  within the bounded file tail.
 - **Tokens:** last recorded cumulative session token total, not context occupancy.
 - **Limit:** last reported primary rate-limit window usage. This can be old,
   applies beyond a single session, and must not be added across rows.
 
 Recent sessions are sorted by file modification time. Subagents are hidden by
 default. Archived sessions and sessions on other machines are not included.
-Prompts, tool arguments, tool output, and credentials are not displayed or retained
-in the projection. JSON output includes local project paths and session IDs.
+The graphical view and JSON output include bounded user prompts, assistant
+messages, error messages, local project paths, and session IDs. Treat these like
+the underlying conversation when sharing a screenshot or JSON snapshot. Reasoning
+records, system/developer instructions, raw tool arguments, and raw tool output
+are not included. Tool activity shows names and completion status only. Message
+previews stay in memory and are not written to deck preferences or diagnostics.
 
 ## Integration boundary and limitations
 
@@ -103,14 +144,17 @@ may not appear. Unknown records are ignored; missing evidence stays unknown.
 
 Reads are bounded to a 1 MiB metadata header and a 512 KiB tail per changed file.
 Unchanged files are cached. Scanning stats all JSONL files, then reads at most
-`max(100, limit * 10)` recent candidates per refresh; very large histories may
+`max(100, limit * 10)` recent candidates plus pinned filenames per refresh; very large histories may
 still make discovery slow. Metadata above the header bound is skipped. If a turn
 start, model, or usage record has fallen outside the tail, that field can be
 unknown. Partial final records wait until their newline arrives. Missing and
-unreadable files are handled without modifying them.
+unreadable files are handled without modifying them. Title-index reads are capped
+at the last 1 MiB; older titles outside that window may be unavailable. Message
+previews are capped at 2,000 characters each, with at most 12 activity entries.
 
 There are no approvals, terminal input, session resume, hooks, listeners, or
-inference calls in this milestone. The monitor only opens files for reading.
+inference calls in this milestone. Codex files are only opened for reading; only
+the deck's own pin/hide preferences are written.
 
 Codex's [documented app-server protocol](https://learn.chatgpt.com/docs/app-server)
 provides thread listing, reading, runtime status, and approval handling. Runtime
@@ -125,7 +169,8 @@ threads to manufacture visibility.
 1. **Implemented:** discover existing Codex sessions and validate an honest,
    read-only state model on Linux, with synthetic regression fixtures.
 2. **Implemented prototype:** a local Tk strip window using the same projection,
-   with fullscreen mode and large pagination controls. Validate daily use on
+   with richer cards, expandable details, saved pins/hiding, fullscreen mode,
+   and large touch controls. Validate daily use on
    the physical display before expanding controls or choosing a final toolkit.
 3. Add verified owning-server observation where available, with explicit source
    and freshness indicators.
