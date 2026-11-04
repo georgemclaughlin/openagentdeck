@@ -5,7 +5,7 @@ Codex sessions. It follows GNOME's appearance, window controls, keyboard focus,
 and accessibility conventions, and runs directly on Wayland. The strip layout
 targets **1920 × 480**, with fewer cards and a compact detail view in smaller windows.
 Both the monitoring backend and interface run in one compiled application.
-No Python bridge, API key, or Codex configuration changes are required.
+No API key or Codex configuration changes are required.
 
 ## Build and run
 
@@ -24,19 +24,10 @@ sudo dnf install gcc pkgconf-pkg-config gtk4-devel libadwaita-devel
 The launcher uses Cargo with the committed lockfile. Standard Cargo commands
 work too: `cargo build --locked --release --manifest-path linux/Cargo.toml`, then
 run `linux/target/release/openagentdeck`. The resulting binary needs the GTK and
-libadwaita runtime libraries, but not Cargo or Python. The launcher also accepts
+libadwaita runtime libraries; Cargo is only needed to build it. The launcher also accepts
 local development metadata under
 `$XDG_CACHE_HOME/openagentdeck/devel/usr/lib64/pkgconfig` (default `~/.cache`).
 That optional development cache is machine-local and is not shipped in the repo.
-
-The earlier Python implementation remains as a reference/fallback during this
-migration. It is not used by the native app:
-
-```sh
-python3 linux/monitor.py                    # dependency-free terminal monitor
-python3 linux/monitor.py --once             # one terminal snapshot
-python3 linux/dashboard.py                  # legacy Tk prototype (requires Tkinter)
-```
 
 ## Checks
 
@@ -45,7 +36,6 @@ cargo test --locked --manifest-path linux/Cargo.toml --no-default-features
 # With GTK development dependencies installed:
 cargo test --locked --manifest-path linux/Cargo.toml
 ./linux/run.sh --demo --smoke-test /tmp/deck-preview
-python3 -m unittest discover -s linux -v    # earlier implementation's regressions
 ```
 
 The native smoke check opens a normal window using synthetic data, checks card
@@ -108,9 +98,8 @@ Demo mode keeps its choices in memory and never writes preferences.
 Only already enabled outputs are listed. An unavailable requested output leaves
 the app windowed with a notice; losing a selected output exits fullscreen. The
 compositor ultimately decides window placement and fullscreen. Wayland does not
-allow arbitrary application-chosen window coordinates, so the old Tk
-`--geometry WIDTHxHEIGHT+X+Y` form is not supported (`--geometry WIDTHxHEIGHT`
-remains an alias for `--size`).
+allow arbitrary application-chosen window coordinates. Use `--size WIDTHxHEIGHT`
+for the window dimensions and `--monitor` to select a fullscreen output.
 
 **The app never changes display layout, rotation, touchscreen mapping, or KVM
 settings.** Validation of this migration used a normal window on the main GNOME
@@ -148,12 +137,13 @@ The graphical view shows up to 48 root sessions, four per page at strip
 width. Pins sort first, then fresh working observations. Hidden sessions still
 count toward the scan limit. Updates are read on a background
 Rust worker thread so filesystem scanning does not block touch interaction. The
-GTK main thread owns all widgets; bounded snapshots cross a channel. It preserves
-the terminal prototype's observation semantics and limitations below.
+GTK main thread owns all widgets; bounded snapshots cross a channel. The
+observation semantics and limitations are described below.
 
 The default source is `$CODEX_HOME/sessions`, or `~/.codex/sessions` when that
-variable is unset. Rust `--json` emits one snapshot; the legacy terminal monitor
-also emits a single snapshot when piped. Refresh is every two seconds; `--interval`, `--limit`, and `--stale-after` are configurable.
+variable is unset. `--json` emits one snapshot without opening a window.
+Refresh is every two seconds; `--interval`, `--limit`, and `--stale-after`
+are configurable.
 
 ## What the display means
 
@@ -182,7 +172,7 @@ previews stay in memory and are not written to deck preferences or diagnostics.
 
 ## Integration boundary and limitations
 
-This prototype reads local rollout JSONL records observed with **codex-cli
+The monitor reads local rollout JSONL records observed with **codex-cli
 0.166.0**. This storage format is an internal, version-sensitive adapter, not a
 promised public API. Sessions that use another storage format or home directory
 may not appear. Unknown records are ignored; missing evidence stays unknown.

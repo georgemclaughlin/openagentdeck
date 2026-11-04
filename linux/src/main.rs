@@ -30,7 +30,7 @@ pub struct Args {
     #[arg(long)]
     include_subagents: bool,
     /// Initial window size; Wayland does not support application-chosen coordinates
-    #[arg(long, alias = "geometry", default_value = "1920x480", value_parser = size)]
+    #[arg(long, default_value = "1920x480", value_parser = size)]
     size: (i32, i32),
     #[arg(long)]
     fullscreen: bool,
