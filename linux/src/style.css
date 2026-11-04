@@ -1,4 +1,10 @@
 .touch { min-height: 56px; min-width: 66px; padding: 6px 14px; }
+/* Keep native window actions, with larger targets and icons for the strip. */
+.deck-header windowcontrols button,
+.deck-header menubutton > button { min-width: 48px; min-height: 48px; padding: 0; }
+.deck-header windowcontrols button image { min-width: 40px; min-height: 40px; }
+.deck-header windowcontrols button image,
+.deck-header menubutton > button image { -gtk-icon-size: 20px; }
 .session-card { padding: 18px; border-radius: 14px; }
 .session-card:hover { background: alpha(@accent_color, 0.08); }
 .session-card:focus-visible { outline: 3px solid @accent_color; outline-offset: -3px; }

@@ -244,6 +244,7 @@ impl Deck {
         window.set_size_request(720, 400);
         let toolbar = adw::ToolbarView::new();
         let header = adw::HeaderBar::new();
+        header.add_css_class("deck-header");
         let title = adw::WindowTitle::new("Codex Deck", "Existing local sessions");
         header.set_title_widget(Some(&title));
         let menu = gtk::MenuButton::builder()
