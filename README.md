@@ -1,5 +1,11 @@
 # Open Agent Deck
 
+> **Codex/Linux fork:** a first read-only monitor for existing Codex sessions is
+> available in [`linux/`](linux/README.md). Run `python3 linux/dashboard.py` for the
+> graphical USB-C strip dashboard, or `python3 linux/monitor.py` in a terminal.
+> These are read-only prototypes; the macOS application described below remains the
+> upstream Claude Code implementation.
+
 [![The 8.8" strip display on its 3D-printed snap-clip desk stand](deskstand/out/8_readme.png)](deskstand/README.md)
 
 A native macOS app that turns a touchscreen strip display (8.8" 480×1920 bar) into a live control deck for [Claude Code](https://code.claude.com): glanceable state for every running session, approve/deny from the strip, one-tap focus.
