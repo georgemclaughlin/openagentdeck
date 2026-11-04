@@ -1,0 +1,5 @@
+.touch { min-height: 56px; min-width: 66px; padding: 6px 14px; }
+.session-card { padding: 18px; border-radius: 14px; }
+.session-card:hover { background: alpha(@accent_color, 0.08); }
+.session-card:focus-visible { outline: 3px solid @accent_color; outline-offset: -3px; }
+.history { font-size: 16px; background: @view_bg_color; color: @view_fg_color; }

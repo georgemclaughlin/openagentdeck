@@ -1,22 +1,58 @@
 # Codex monitor for Linux
 
-Read-only graphical and terminal dashboards for **existing local Codex sessions**.
-The graphical dashboard targets the upstream 8.8-inch strip at **1920 × 480**.
-Requires Python 3.10 or newer; the window additionally needs Tkinter (provided by
-the distribution's Python/Tk package). No API key or Codex configuration changes.
+A native **Rust + GTK 4 + libadwaita** application for monitoring existing local
+Codex sessions. It follows GNOME's appearance, window controls, keyboard focus,
+and accessibility conventions, and runs directly on Wayland. The strip layout
+targets **1920 × 480**, with fewer cards and a compact detail view in smaller windows.
+Both the monitoring backend and interface run in one compiled application.
+No Python bridge, API key, or Codex configuration changes are required.
 
-From the repository root:
+## Build and run
+
+Requires Rust 1.92+, GTK 4.12+, and libadwaita 1.5+. On Fedora:
 
 ```sh
-python3 linux/dashboard.py                  # graphical strip dashboard
-python3 linux/dashboard.py --demo           # synthetic data, without reading sessions
-python3 linux/monitor.py                    # refresh in a terminal; Ctrl+C exits
-python3 linux/monitor.py --once             # one snapshot
-python3 linux/monitor.py --json             # structured snapshot, including message previews
-python3 linux/monitor.py --include-subagents
-python3 linux/monitor.py --sessions-dir /path/to/codex/sessions
-python3 -m unittest discover -s linux -v
+sudo dnf install gcc pkgconf-pkg-config gtk4-devel libadwaita-devel
+./linux/run.sh                              # native application
+./linux/run.sh --demo                       # synthetic data; no personal files
+./linux/run.sh --list-monitors              # enabled outputs only
+./linux/run.sh --json                       # one Rust backend snapshot
+./linux/run.sh --sessions-dir /path/to/codex/sessions
+./linux/run.sh --size 800x400
 ```
+
+The launcher uses Cargo with the committed lockfile. Standard Cargo commands
+work too: `cargo build --locked --release --manifest-path linux/Cargo.toml`, then
+run `linux/target/release/openagentdeck`. The resulting binary needs the GTK and
+libadwaita runtime libraries, but not Cargo or Python. The launcher also accepts
+local development metadata under
+`$XDG_CACHE_HOME/openagentdeck/devel/usr/lib64/pkgconfig` (default `~/.cache`).
+That optional development cache is machine-local and is not shipped in the repo.
+
+The earlier Python implementation remains as a reference/fallback during this
+migration. It is not used by the native app:
+
+```sh
+python3 linux/monitor.py                    # dependency-free terminal monitor
+python3 linux/monitor.py --once             # one terminal snapshot
+python3 linux/dashboard.py                  # legacy Tk prototype (requires Tkinter)
+```
+
+## Checks
+
+```sh
+cargo test --locked --manifest-path linux/Cargo.toml --no-default-features
+# With GTK development dependencies installed:
+cargo test --locked --manifest-path linux/Cargo.toml
+./linux/run.sh --demo --smoke-test /tmp/deck-preview
+python3 -m unittest discover -s linux -v    # earlier implementation's regressions
+```
+
+The native smoke check opens a normal window using synthetic data, checks card
+activation, pin/hide/restore, stable history scrolling, compact layout, and an
+unavailable display selection, then saves PNG previews and closes. It requires
+a graphical session; it never enables a monitor or enters fullscreen. Backend
+tests run without a display or GTK using `--no-default-features`.
 
 ## Session cards and details
 
@@ -31,7 +67,7 @@ title changes appear even when the session's rollout has not changed.
 
 The detail view shows up to 12 recent messages/activity records, newest first,
 plus the latest observed prompt or error if it has fallen out of that list. Use
-**Older/Newer**, the scrollbar, or the mouse wheel to read more. Text is selectable
+**Older/Newer**, touch scrolling, the scrollbar, or the mouse wheel to read more. Text is selectable
 and read-only. While browsing older messages, updates wait until you return to
 the top so the text does not jump under you. **Back** or **Esc** returns to the cards; Esc from the overview
 leaves fullscreen.
@@ -56,23 +92,31 @@ Demo mode keeps its choices in memory and never writes preferences.
 1. Connect the display to a USB-C port with video output. In Linux display
    settings, extend the desktop and rotate the strip to **1920 × 480 landscape**.
    The panel reports its native mode as **480 × 1920**, so rotation is expected.
-2. Run `python3 linux/dashboard.py`, drag the window onto the strip, then tap
-   **Fullscreen** or press **F11**. From the overview, **Esc** returns to a normal window; **Exit**
-   closes the dashboard. The bottom arrows page through sessions.
-3. Check that a tap on an arrow activates that arrow. If touch lands on the main
-   display, map the touchscreen to the strip in your desktop environment.
-
-For a known desktop arrangement, position the window explicitly before entering
-fullscreen. For example, a strip below a 2560 × 1440 main display, centered:
+2. Run `./linux/run.sh`. In the header's **Display options** menu, select the
+   strip's connector, then tap **Fullscreen** or press **F11**. Alternatively,
+   drag the window to the strip and fullscreen on **Current display**.
+3. From the overview, **Esc** leaves fullscreen; close using the native window
+   controls. **Previous/Next**, keyboard arrows, or a horizontal touch swipe page
+   through cards. Check that a tap on a control lands on that control; touchscreen
+   mapping belongs to your desktop settings.
 
 ```sh
-python3 linux/dashboard.py --geometry 1920x480+320+1440 --fullscreen
+./linux/run.sh --list-monitors
+./linux/run.sh --monitor DP-3 --fullscreen
 ```
 
-The window does not change display rotation or touchscreen settings. Those are
-desktop settings; the example coordinates are specific to that arrangement.
-On GNOME Wayland the Tk window runs through XWayland. Other desktop environments
-and display scaling configurations still need hardware validation.
+Only already enabled outputs are listed. An unavailable requested output leaves
+the app windowed with a notice; losing a selected output exits fullscreen. The
+compositor ultimately decides window placement and fullscreen. Wayland does not
+allow arbitrary application-chosen window coordinates, so the old Tk
+`--geometry WIDTHxHEIGHT+X+Y` form is not supported (`--geometry WIDTHxHEIGHT`
+remains an alias for `--size`).
+
+**The app never changes display layout, rotation, touchscreen mapping, or KVM
+settings.** Validation of this migration used a normal window on the main GNOME
+Wayland display. The strip remains disabled on the development machine because
+of the Comet issue below. Physical touch gestures, display hotplug/fullscreen,
+other desktops, and display scaling still need hardware validation.
 
 ### GL.iNet Comet / absolute KVM mouse
 
@@ -103,12 +147,13 @@ gsettings reset org.gnome.desktop.peripherals.touchscreen:/org/gnome/desktop/per
 The graphical view shows up to 48 root sessions, four per page at strip
 width. Pins sort first, then fresh working observations. Hidden sessions still
 count toward the scan limit. Updates are read on a background
-thread so filesystem scanning does not block touch interaction. It shares the
-terminal monitor's observation semantics and limitations below.
+Rust worker thread so filesystem scanning does not block touch interaction. The
+GTK main thread owns all widgets; bounded snapshots cross a channel. It preserves
+the terminal prototype's observation semantics and limitations below.
 
 The default source is `$CODEX_HOME/sessions`, or `~/.codex/sessions` when that
-variable is unset. Pipes automatically receive a single snapshot. Refresh is
-every two seconds; `--interval`, `--limit`, and `--stale-after` are configurable.
+variable is unset. Rust `--json` emits one snapshot; the legacy terminal monitor
+also emits a single snapshot when piped. Refresh is every two seconds; `--interval`, `--limit`, and `--stale-after` are configurable.
 
 ## What the display means
 
@@ -168,10 +213,10 @@ threads to manufacture visibility.
 
 1. **Implemented:** discover existing Codex sessions and validate an honest,
    read-only state model on Linux, with synthetic regression fixtures.
-2. **Implemented prototype:** a local Tk strip window using the same projection,
-   with richer cards, expandable details, saved pins/hiding, fullscreen mode,
-   and large touch controls. Validate daily use on
-   the physical display before expanding controls or choosing a final toolkit.
+2. **Implemented native port:** a Rust monitoring library and GTK/libadwaita app,
+   with richer cards, expandable details, compatible saved pins/hiding, native
+   selectable text, touch scrolling/paging, and fullscreen output selection.
+   Validate daily use and physical touch on the strip before expanding controls.
 3. Add verified owning-server observation where available, with explicit source
    and freshness indicators.
 4. Consider approval controls separately once ownership, routing, and reconnect
@@ -181,3 +226,17 @@ The upstream SwiftUI app remains the Claude/macOS implementation. Its UI concept
 state-machine design, and regression scenarios guide this port; SwiftUI, AppKit,
 cmux routing, and Claude hook installation are not Linux dependencies. The
 upstream Apache-2.0 license, NOTICE, and hardware stand assets remain in place.
+
+## Source layout
+
+- `src/model.rs`: pure session reducer and bounded, human-facing history.
+- `src/monitor.rs`: read-only rollout adapter, discovery cache, and title index.
+- `src/preferences.rs`: compatible deck-only pin/hide storage with atomic writes.
+- `src/ui.rs`, `src/style.css`: GTK/libadwaita widgets and background observation.
+- `src/main.rs`: CLI options, native startup, and headless JSON snapshots.
+- `tests/backend.rs`: synthetic regression cases, runnable without GTK.
+
+GTK and libadwaita provide native GNOME controls and touch input; this is not a
+webview. Rust offers typed state and a compiled deployment, while the pure backend
+stays independent of the UI. The rollout format remains the version-sensitive
+integration boundary regardless of implementation language.

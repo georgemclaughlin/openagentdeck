@@ -22,3 +22,4 @@ Config/Local.xcconfig
 *.profraw
 .claude/
 __pycache__/
+linux/target/
